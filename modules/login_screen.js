@@ -14,6 +14,7 @@ export default class LoginScreen extends Component {
     super(props);
     this.email = '';
     this.password = '';
+    this.isEmailCorrect = false;
   }
 
   render() {
@@ -68,11 +69,13 @@ export default class LoginScreen extends Component {
   onCheckEmailInput(text) {
     this.email = text;
     if (!validator.isEmail(text)) {
+      this.isEmailCorrect = false;
       this.textInputEmail.setNativeProps({
         borderColor: '#DC7575',
         borderWidth: 1,
       });
     } else if (validator.isEmail(text)) {
+      this.isEmailCorrect = true;
       this.textInputEmail.setNativeProps({
         borderColor: '#CCCCCC',
         borderBottomWidth: 0,
@@ -86,8 +89,11 @@ export default class LoginScreen extends Component {
   onLogin = () => {
     if (this.email === '' || this.password === '') {
       Alert.alert('Please provide all details');
+    } else if (!this.isEmailCorrect) {
+      Alert.alert('Please provide a valid email');
     } else {
       // Make POST request to backend
+      this.props.navigation.navigate('Tickets');
     }
   };
 }
