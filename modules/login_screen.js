@@ -1,9 +1,19 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import validator from 'validator';
 
 export default class LoginScreen extends Component {
   constructor(props) {
     super(props);
+    this.email = '';
+    this.password = '';
   }
 
   render() {
@@ -17,13 +27,21 @@ export default class LoginScreen extends Component {
         </View>
         <View>
           <View>
-            <TextInput style={styles.textInputEmail} placeholder="Email" />
+            <TextInput
+              style={styles.textInputEmail}
+              placeholder="Email"
+              ref={component => (this.textInputEmail = component)}
+              onChangeText={text => this.onCheckEmailInput(text)}
+            />
             <TextInput
               style={styles.textInputPassword}
               placeholder="Password"
+              onChangeText={text => (this.password = text)}
             />
           </View>
-          <Text style={styles.buttonLogMeIn}>Log me in</Text>
+          <TouchableOpacity onPress={this.onLogin}>
+            <Text style={styles.buttonLogIn}>Log me in</Text>
+          </TouchableOpacity>
         </View>
         <View>
           <Text style={styles.textLoginInfo}>
@@ -42,6 +60,36 @@ export default class LoginScreen extends Component {
       </View>
     );
   }
+
+  /**
+   * Validates email pattern
+   * @param text containing the email
+   */
+  onCheckEmailInput(text) {
+    this.email = text;
+    if (!validator.isEmail(text)) {
+      this.textInputEmail.setNativeProps({
+        borderColor: '#DC7575',
+        borderWidth: 1,
+      });
+    } else if (validator.isEmail(text)) {
+      this.textInputEmail.setNativeProps({
+        borderColor: '#CCCCCC',
+        borderBottomWidth: 0,
+      });
+    }
+  }
+
+  /**
+   * Validates the email and password input for empty entries
+   */
+  onLogin = () => {
+    if (this.email === '' || this.password === '') {
+      Alert.alert('Please provide all details');
+    } else {
+      // Make POST request to backend
+    }
+  };
 }
 
 const styles = StyleSheet.create({
@@ -82,7 +130,7 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  buttonLogMeIn: {
+  buttonLogIn: {
     backgroundColor: '#687DFC',
     borderRadius: 8,
     color: '#FFFFFF',

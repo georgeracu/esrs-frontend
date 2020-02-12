@@ -1,9 +1,20 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import validator from 'validator';
 
 export default class RegisterScreen extends Component {
   constructor(props) {
     super(props);
+    this.fullname = '';
+    this.email = '';
+    this.password = '';
   }
 
   render() {
@@ -21,14 +32,23 @@ export default class RegisterScreen extends Component {
             <TextInput
               style={styles.textInputFullname}
               placeholder="Fullname"
+              onChangeText={text => (this.fullname = text)}
             />
-            <TextInput style={styles.textInputEmail} placeholder="Email" />
+            <TextInput
+              style={styles.textInputEmail}
+              placeholder="Email"
+              ref={component => (this.textInputEmail = component)}
+              onChangeText={text => this.onCheckEmailInput(text)}
+            />
             <TextInput
               style={styles.textInputPassword}
               placeholder="Password"
+              onChangeText={text => (this.password = text)}
             />
           </View>
-          <Text style={styles.buttonSignUp}>Sign me up</Text>
+          <TouchableOpacity onPress={this.onSignUp}>
+            <Text style={styles.buttonSignUp}>Sign me up</Text>
+          </TouchableOpacity>
         </View>
         <View>
           <Text style={styles.textRegisterInfo}>
@@ -44,6 +64,37 @@ export default class RegisterScreen extends Component {
       </View>
     );
   }
+
+  /**
+   * Validates email pattern
+   * @param text containing the email
+   */
+  onCheckEmailInput(text) {
+    this.email = text;
+    if (!validator.isEmail(text)) {
+      this.textInputEmail.setNativeProps({
+        borderColor: '#DC7575',
+        borderWidth: 1,
+      });
+    } else if (validator.isEmail(text)) {
+      this.textInputEmail.setNativeProps({
+        borderColor: '#CCCCCC',
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+      });
+    }
+  }
+
+  /**
+   * Validates the fullname, email and password input for empty entries
+   */
+  onSignUp = () => {
+    if (this.fullname === '' || this.email === '' || this.password === '') {
+      Alert.alert('Please provide all details');
+    } else {
+      // Make POST request to backend
+    }
+  };
 }
 
 const styles = StyleSheet.create({
