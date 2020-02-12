@@ -10,6 +10,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import LoginScreen from './modules/login_screen.js';
 import RegisterScreen from './modules/register_screen.js';
 
 function App() {
@@ -18,11 +19,8 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{headerShown: false}}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

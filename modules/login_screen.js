@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, TextInput, View} from 'react-native';
 
-export default class RegisterScreen extends Component {
+export default class LoginScreen extends Component {
   constructor(props) {
     super(props);
   }
@@ -11,34 +11,32 @@ export default class RegisterScreen extends Component {
       <View style={styles.root}>
         <Text style={styles.appName}>REPAYLINE</Text>
         <View>
-          <Text style={styles.welcomeMessage}>Welcome</Text>
-          <Text style={styles.welcomeMessage}>sign up and</Text>
-          <Text style={styles.welcomeMessage}>reclaim your</Text>
-          <Text style={styles.welcomeMessage}>money.</Text>
+          <Text style={styles.welcomeMessage}>Hi there</Text>
+          <Text style={styles.welcomeMessage}>please login</Text>
+          <Text style={styles.welcomeMessage}>to your account.</Text>
         </View>
         <View>
           <View>
-            <TextInput
-              style={styles.textInputFullname}
-              placeholder="Fullname"
-            />
             <TextInput style={styles.textInputEmail} placeholder="Email" />
             <TextInput
               style={styles.textInputPassword}
               placeholder="Password"
             />
           </View>
-          <Text style={styles.buttonSignUp}>Sign me up</Text>
+          <Text style={styles.buttonLogMeIn}>Log me in</Text>
         </View>
         <View>
-          <Text style={styles.textRegisterInfo}>
-            By creating an account you agree to our
+          <Text style={styles.textLoginInfo}>
+            Forgot password?{' '}
+            <Text style={styles.textLoginInfoLink}>Get it now</Text>
           </Text>
-          <Text style={styles.textRegisterInfo}>
-            <Text style={styles.textRegisterInfoLink}>
-              Terms &amp; Conditions
-            </Text>{' '}
-            and <Text style={styles.textRegisterInfoLink}>Privacy Policy</Text>
+          <Text style={styles.textLoginInfo}>
+            Don't have an account?{' '}
+            <Text
+              style={styles.textLoginInfoLink}
+              onPress={() => this.props.navigation.navigate('Register')}>
+              Sign up now
+            </Text>
           </Text>
         </View>
       </View>
@@ -64,17 +62,11 @@ const styles = StyleSheet.create({
     color: '#CCCCCC',
     fontFamily: 'sans-serif-light',
   },
-  textInputFullname: {
-    borderColor: '#CCCCCC',
-    borderWidth: 1,
-    height: 60,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    padding: 20,
-    fontFamily: 'sans-serif-light',
-  },
   textInputEmail: {
     borderColor: '#CCCCCC',
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
     height: 60,
@@ -90,7 +82,7 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  buttonSignUp: {
+  buttonLogMeIn: {
     backgroundColor: '#687DFC',
     borderRadius: 8,
     color: '#FFFFFF',
@@ -98,10 +90,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 30,
   },
-  textRegisterInfo: {
+  textLoginInfo: {
     textAlign: 'center',
+    paddingTop: 5,
   },
-  textRegisterInfoLink: {
+  textLoginInfoLink: {
     fontWeight: 'bold',
     color: '#687DFC',
   },
