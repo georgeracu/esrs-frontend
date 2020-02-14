@@ -1,16 +1,27 @@
 import React, {Component} from 'react';
 import {
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 export default class TicketsScreen extends Component {
+
   constructor(props) {
     super(props);
+    auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log("Tickets User is signed in");
+      } else {
+        console.log("User isn't signed in");
+        props.navigation.navigate('Login');
+      }
+    });
   }
 
   render() {
@@ -24,6 +35,7 @@ export default class TicketsScreen extends Component {
           style={styles.textInputTicketsSearch}
           ref={component => (this.textInputTicketsSearch = component)}
         />
+        <ScrollView />
         <TouchableOpacity style={styles.fab}>
           <Text style={styles.textPlusSymbol}>+</Text>
         </TouchableOpacity>

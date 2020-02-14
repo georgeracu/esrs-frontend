@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import validator from 'validator';
+import auth from '@react-native-firebase/auth';
 
 export default class RegisterScreen extends Component {
   constructor(props) {
@@ -16,6 +17,24 @@ export default class RegisterScreen extends Component {
     this.email = '';
     this.password = '';
     this.isEmailCorrect = false;
+  }
+
+  /**
+   * This creates a new user credential
+   * @param {*} email of the user
+   * @param {*} password of the user
+   */
+  async signUp(email, password) {
+    await auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        console.log('Credential: ' + userCredential);
+        // Make POST request to backend
+        this.props.navigation.navigate('Tickets');
+      })
+      .catch(error => {
+        console.log(error.message);
+      });
   }
 
   render() {
@@ -44,6 +63,7 @@ export default class RegisterScreen extends Component {
             <TextInput
               style={styles.textInputPassword}
               placeholder="Password"
+              secureTextEntry={true}
               onChangeText={text => (this.password = text)}
             />
           </View>
@@ -93,12 +113,13 @@ export default class RegisterScreen extends Component {
    */
   onSignUp = () => {
     if (this.fullname === '' || this.email === '' || this.password === '') {
-      Alert.alert('Please provide all details');
+      Alert.alert('Sing Up', 'Please provide all details');
     } else if (!this.isEmailCorrect) {
-      Alert.alert('Please provide a valid email');
+      Alert.alert('Sing Up', 'Please provide a valid email');
+    } else if (this.password.length < 6) {
+      Alert.alert('Sing Up', 'Password must be at least 6 characters long');
     } else {
-      // Make POST request to backend
-      this.props.navigation.navigate('Tickets');
+      this.signUp(this.email, this.password);
     }
   };
 }

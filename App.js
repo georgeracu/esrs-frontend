@@ -20,9 +20,9 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
+        <Stack.Screen name="Tickets" component={TicketsScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Tickets" component={TicketsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
