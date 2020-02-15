@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {AsyncStorage, StyleSheet, Text, View} from 'react-native';
-import credentialsUtils from '../utils/credentials_utils';
+import auth from '@react-native-firebase/auth';
 
 export default class SplashScreen extends Component {
   constructor(props) {
@@ -10,12 +10,37 @@ export default class SplashScreen extends Component {
   async componentDidMount() {
     const email = await AsyncStorage.getItem('email');
     const password = await AsyncStorage.getItem('password');
-    const credential = email + password; // Concatenating empty or null values give you "" or 0
+    const credential = email + password; // Concatenating empty or null values gives you "" or 0
     if (credential === '' || credential === 0) {
-      this.props.navigation.navigate('Login');
+      this.props.navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
     } else {
-      await credentialsUtils.signIn(email, password, this.props);
+      this.authUser(email, password);
     }
+  }
+
+  /**
+   * This authenticates a user upon subsequent app launch
+   * @param {*} email of the user
+   * @param {*} password of the user
+   */
+  authUser(email, password) {
+    auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Tickets'}],
+        });
+      })
+      .catch(() => {
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      });
   }
 
   render() {
