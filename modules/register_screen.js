@@ -26,7 +26,7 @@ export default class RegisterScreen extends Component {
    * @param {*} password of the user
    */
   async signUp(email, password) {
-    await auth()
+    auth()
       .createUserWithEmailAndPassword(email, password)
       .then(async () => {
         // Persist user's credentials
@@ -57,10 +57,9 @@ export default class RegisterScreen extends Component {
       <View style={styles.root}>
         <Text style={styles.appName}>REPAYLINE</Text>
         <View>
-          <Text style={styles.welcomeMessage}>Welcome</Text>
-          <Text style={styles.welcomeMessage}>sign up and</Text>
-          <Text style={styles.welcomeMessage}>reclaim your</Text>
-          <Text style={styles.welcomeMessage}>money.</Text>
+          <Text style={styles.welcomeMessageFirstLine}>Welcome</Text>
+          <Text style={styles.welcomeMessage}>sign up and reclaim</Text>
+          <Text style={styles.welcomeMessage}>your money.</Text>
         </View>
         <View>
           <View>
@@ -156,6 +155,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: '#CCCCCC',
     fontFamily: 'sans-serif-light',
+  },
+  welcomeMessageFirstLine: {
+    fontFamily: 'sans-serif',
+    color: '#CCCCCC',
+    fontSize: 30,
   },
   textInputFullname: {
     borderColor: '#CCCCCC',
