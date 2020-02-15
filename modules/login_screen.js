@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import validator from 'validator';
-import credentialsUtils from '../utils/credentials_utils';
+import auth from '@react-native-firebase/auth';
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -94,9 +94,43 @@ export default class LoginScreen extends Component {
     } else if (!this.isEmailCorrect) {
       Alert.alert('Sign In', 'Please provide a valid email');
     } else {
-      credentialsUtils.signIn(this.email, this.password, this.props);
+      this.authUser(this.email, this.password);
     }
   };
+
+  /**
+   * This authenticates a user upon sign in
+   * @param {*} email of the user
+   * @param {*} password of the user
+   */
+  authUser(email, password) {
+    auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Tickets'}],
+        });
+      })
+      .catch(error => {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            Alert.alert(
+              'Sign In',
+              "Sorry, you don't have an account, please sign up for one",
+            );
+            break;
+          case 'auth/invalid-email':
+            Alert.alert('Sign In', `Hey, ${email} is invalid`);
+            break;
+          case 'auth/wrong-password':
+            Alert.alert('Sign In', 'Hey, looks like your password is wrong');
+            break;
+          default:
+          // Do nothing
+        }
+      });
+  }
 }
 
 const styles = StyleSheet.create({

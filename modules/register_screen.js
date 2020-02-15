@@ -33,7 +33,10 @@ export default class RegisterScreen extends Component {
         await AsyncStorage.setItem('email', email);
         await AsyncStorage.setItem('password', password);
         // Make POST request to backend
-        this.props.navigation.navigate('Tickets');
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Tickets'}],
+        });
       })
       .catch(error => {
         switch (error.code) {
