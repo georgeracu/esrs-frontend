@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-  Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -24,6 +24,7 @@ export default class TicketsScreen extends Component {
           style={styles.textInputTicketsSearch}
           ref={component => (this.textInputTicketsSearch = component)}
         />
+        <ScrollView />
         <TouchableOpacity style={styles.fab}>
           <Text style={styles.textPlusSymbol}>+</Text>
         </TouchableOpacity>

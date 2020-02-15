@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "334402522278",
+    "firebase_url": "https://esrs-app.firebaseio.com",
+    "project_id": "esrs-app",
+    "storage_bucket": "esrs-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334402522278:android:8c12b29c54a7191f057867",
+        "android_client_info": {
+          "package_name": "com.esrs"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "334402522278-0sh0koq0m7ukg9vbfsg7ebg6c6m2od07.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-ldn58mAEl-3DKx1WRkscZyu416aXOdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "334402522278-0sh0koq0m7ukg9vbfsg7ebg6c6m2od07.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

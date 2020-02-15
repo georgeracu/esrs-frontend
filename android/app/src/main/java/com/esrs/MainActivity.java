@@ -1,4 +1,4 @@
-package com.awesomeproject;
+package com.esrs;
 
 import com.facebook.react.ReactActivity;
 

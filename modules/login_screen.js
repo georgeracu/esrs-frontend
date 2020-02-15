@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import validator from 'validator';
+import credentialsUtils from '../utils/credentials_utils';
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -37,6 +38,7 @@ export default class LoginScreen extends Component {
             <TextInput
               style={styles.textInputPassword}
               placeholder="Password"
+              secureTextEntry={true}
               onChangeText={text => (this.password = text)}
             />
           </View>
@@ -86,14 +88,13 @@ export default class LoginScreen extends Component {
   /**
    * Validates the email and password input for empty entries
    */
-  onLogin = () => {
+  onLogin = async () => {
     if (this.email === '' || this.password === '') {
-      Alert.alert('Please provide all details');
+      Alert.alert('Sign In', 'Please provide all details');
     } else if (!this.isEmailCorrect) {
-      Alert.alert('Please provide a valid email');
+      Alert.alert('Sign In', 'Please provide a valid email');
     } else {
-      // Make POST request to backend
-      this.props.navigation.navigate('Tickets');
+      credentialsUtils.signIn(this.email, this.password, this.props);
     }
   };
 }

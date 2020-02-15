@@ -1,4 +1,4 @@
-package com.awesomeproject;
+package com.esrs;
 
 import android.app.Application;
 import android.content.Context;
