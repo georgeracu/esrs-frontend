@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import validator from 'validator';
-import auth from '@react-native-firebase/auth';
+import credentialsUtils from '../utils/credentials_utils';
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -16,28 +16,6 @@ export default class LoginScreen extends Component {
     this.email = '';
     this.password = '';
     this.isEmailCorrect = false;
-  }
-
-  /**
-   * This signs in an already existing user
-   * @param {*} email of the user
-   * @param {*} password of the user
-   */
-  async signIn(email, password) {
-    await auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        console.log('Credential: ' + userCredential);
-        // Make POST request to backend
-        this.props.navigation.navigate('Tickets');
-      })
-      .catch(error => {
-        Alert.alert(
-          'Sign Up',
-          "Sorry, you don't have an account, please sign up for one",
-        );
-        console.log(error.message);
-      });
   }
 
   render() {
@@ -110,14 +88,13 @@ export default class LoginScreen extends Component {
   /**
    * Validates the email and password input for empty entries
    */
-  onLogin = () => {
+  onLogin = async () => {
     if (this.email === '' || this.password === '') {
       Alert.alert('Sign In', 'Please provide all details');
     } else if (!this.isEmailCorrect) {
       Alert.alert('Sign In', 'Please provide a valid email');
     } else {
-      // Make POST request to backend
-      this.signIn(this.email, this.password);
+      credentialsUtils.signIn(this.email, this.password, this.props);
     }
   };
 }

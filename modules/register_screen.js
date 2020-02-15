@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
   Alert,
+  AsyncStorage,
   StyleSheet,
   Text,
   TextInput,
@@ -27,13 +28,24 @@ export default class RegisterScreen extends Component {
   async signUp(email, password) {
     await auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        console.log('Credential: ' + userCredential);
+      .then(async () => {
+        // Persist user's credentials
+        await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('password', password);
         // Make POST request to backend
         this.props.navigation.navigate('Tickets');
       })
       .catch(error => {
-        console.log(error.message);
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            Alert.alert('Sign Up', `Hey, ${email} is already in use`);
+            break;
+          case 'auth/invalid-email':
+            Alert.alert('Sign Up', `Hey, ${email} is invalid`);
+            break;
+          default:
+          // Do nothing for now
+        }
       });
   }
 

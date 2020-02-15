@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,20 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import auth from '@react-native-firebase/auth';
 
 export default class TicketsScreen extends Component {
-
   constructor(props) {
     super(props);
-    auth().onAuthStateChanged(function(user) {
-      if (user) {
-        console.log("Tickets User is signed in");
-      } else {
-        console.log("User isn't signed in");
-        props.navigation.navigate('Login');
-      }
-    });
   }
 
   render() {
