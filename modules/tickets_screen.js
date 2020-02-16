@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
-  ScrollView,
+  FlatList,
+  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -12,18 +13,37 @@ import Modal from 'react-native-modal';
 export default class TicketsScreen extends Component {
   constructor(props) {
     super(props);
+    this.journeyFrom = '';
+    this.journeyTo = '';
     this.state = {
       isModalVisible: false,
+      journeys: [],
     };
   }
 
   /**
-   *
+   * Toggles the visibility of the modal
    * @param isVisible
    */
   setModalVisibility(isVisible) {
     this.setState({
       isModalVisible: isVisible,
+    });
+  }
+
+  /**
+   * Adds a new journey
+   */
+  addJourney() {
+    const journey = {
+      id: Math.random().toString(),
+      from: this.journeyFrom,
+      to: this.journeyTo,
+    };
+    const journeys = this.state.journeys;
+    journeys.push(journey);
+    this.setState({
+      ...journeys,
     });
   }
 
@@ -34,11 +54,34 @@ export default class TicketsScreen extends Component {
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>travels</Text>
         </View>
-        <TextInput
-          style={styles.textInputTicketsSearch}
-          ref={component => (this.textInputTicketsSearch = component)}
+        <View style={styles.ticketsSearchIconContainer}>
+          <TextInput
+            style={styles.textInputTicketsSearch}
+            ref={component => (this.textInputTicketsSearch = component)}
+          />
+          <Image
+            style={styles.ticketsSearchIcon}
+            source={require('../resources/search.png')}
+          />
+        </View>
+        <FlatList
+          data={this.state.journeys}
+          keyExtractor={journey => journey.id}
+          renderItem={({item}) => (
+            <View style={styles.journeyView}>
+              <View style={styles.imageTrainLogoContainer}>
+                <Image source={require('../resources/train_placeholder.png')} />
+              </View>
+              <View style={styles.journeyDetails}>
+                <Text>{item.from}</Text>
+                <Image
+                  source={require('../resources/arrow-circle-right.png')}
+                />
+                <Text>{item.to}</Text>
+              </View>
+            </View>
+          )}
         />
-        <ScrollView />
         <TouchableOpacity
           style={styles.fab}
           onPress={() => {
@@ -53,11 +96,13 @@ export default class TicketsScreen extends Component {
                 style={styles.textInputStation}
                 placeholder="Departure Station:"
                 ref={component => (this.textInputDepartStation = component)}
+                onChangeText={text => (this.journeyFrom = text)}
               />
               <TextInput
                 style={styles.textInputStation}
                 placeholder="Destination Station:"
                 ref={component => (this.textInputDestStation = component)}
+                onChangeText={text => (this.journeyTo = text)}
               />
             </View>
             <Text style={styles.selectDate}>Select Date</Text>
@@ -65,7 +110,11 @@ export default class TicketsScreen extends Component {
               <TouchableOpacity onPress={() => this.setModalVisibility(false)}>
                 <Text style={styles.modalButton}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  this.addJourney();
+                  this.setModalVisibility(false);
+                }}>
                 <Text style={styles.modalButton}>Add Journey</Text>
               </TouchableOpacity>
             </View>
@@ -91,15 +140,22 @@ const styles = StyleSheet.create({
     color: '#190320',
     fontFamily: 'sans-serif-thin',
   },
+  ticketsSearchIconContainer: {
+    height: 60,
+    marginTop: 10,
+  },
+  ticketsSearchIcon: {
+    position: 'absolute',
+    right: 20,
+    top: 20,
+  },
   textInputTicketsSearch: {
     backgroundColor: '#FFFFFF',
     borderColor: '#CCCCCC',
     borderRadius: 8,
     borderWidth: 1,
-    height: 60,
     padding: 20,
     fontFamily: 'sans-serif-light',
-    marginTop: 10,
   },
   fab: {
     height: 60,
@@ -145,5 +201,38 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif-medium',
     margin: 5,
     fontSize: 15,
+  },
+  journeyView: {
+    flexDirection: 'row',
+    marginTop: 10,
+    height: 80,
+  },
+  imageTrainLogoContainer: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 6,
+    borderBottomLeftRadius: 6,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    padding: 10,
+    margin: 1,
+    width: 60,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  journeyDetails: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderTopRightRadius: 6,
+    borderBottomRightRadius: 6,
+    padding: 10,
+    margin: 1,
+    flex: 1,
+    color: '#000000',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    alignContent: 'center',
   },
 });
