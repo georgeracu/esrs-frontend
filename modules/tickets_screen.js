@@ -7,10 +7,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Modal from 'react-native-modal';
 
 export default class TicketsScreen extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isModalVisible: false,
+    };
+  }
+
+  /**
+   *
+   * @param isVisible
+   */
+  setModalVisibility(isVisible) {
+    this.setState({
+      isModalVisible: isVisible,
+    });
   }
 
   render() {
@@ -25,9 +39,20 @@ export default class TicketsScreen extends Component {
           ref={component => (this.textInputTicketsSearch = component)}
         />
         <ScrollView />
-        <TouchableOpacity style={styles.fab}>
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => {
+            console.log('sfds');
+            this.setModalVisibility(!this.state.isModalVisible);
+          }}>
           <Text style={styles.textPlusSymbol}>+</Text>
         </TouchableOpacity>
+        <Modal
+          isVisible={this.state.isModalVisible}>
+          <View>
+
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -72,5 +97,9 @@ const styles = StyleSheet.create({
   textPlusSymbol: {
     fontSize: 30,
     color: '#FFFFFF',
+  },
+  modal: {
+    height: 200,
+    backgroundColor: '#687DFC',
   },
 });
