@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
   Alert,
+  AsyncStorage,
   StyleSheet,
   Text,
   TextInput,
@@ -23,7 +24,7 @@ export default class LoginScreen extends Component {
       <View style={styles.root}>
         <Text style={styles.appName}>REPAYLINE</Text>
         <View>
-          <Text style={styles.welcomeMessage}>Hi there</Text>
+          <Text style={styles.welcomeMessageFirstLine}>Hi there</Text>
           <Text style={styles.welcomeMessage}>please login</Text>
           <Text style={styles.welcomeMessage}>to your account.</Text>
         </View>
@@ -49,7 +50,11 @@ export default class LoginScreen extends Component {
         <View>
           <Text style={styles.textLoginInfo}>
             Forgot password?{' '}
-            <Text style={styles.textLoginInfoLink}>Get it now</Text>
+            <Text
+              style={styles.textLoginInfoLink}
+              onPress={() => this.props.navigation.navigate('ForgotPassword')}>
+              Get it now
+            </Text>
           </Text>
           <Text style={styles.textLoginInfo}>
             Don't have an account?{' '}
@@ -103,10 +108,13 @@ export default class LoginScreen extends Component {
    * @param {*} email of the user
    * @param {*} password of the user
    */
-  authUser(email, password) {
+  async authUser(email, password) {
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
+      .then(async () => {
+        // Persist user's credentials
+        await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('password', password);
         this.props.navigation.reset({
           index: 0,
           routes: [{name: 'Tickets'}],
@@ -150,6 +158,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: '#CCCCCC',
     fontFamily: 'sans-serif-light',
+  },
+  welcomeMessageFirstLine: {
+    fontFamily: 'sans-serif',
+    color: '#CCCCCC',
+    fontSize: 30,
   },
   textInputEmail: {
     borderColor: '#CCCCCC',
