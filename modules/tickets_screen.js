@@ -42,15 +42,33 @@ export default class TicketsScreen extends Component {
         <TouchableOpacity
           style={styles.fab}
           onPress={() => {
-            console.log('sfds');
             this.setModalVisibility(!this.state.isModalVisible);
           }}>
           <Text style={styles.textPlusSymbol}>+</Text>
         </TouchableOpacity>
-        <Modal
-          isVisible={this.state.isModalVisible}>
-          <View>
-
+        <Modal isVisible={this.state.isModalVisible} hasBackdrop={false}>
+          <View style={styles.modal}>
+            <View>
+              <TextInput
+                style={styles.textInputStation}
+                placeholder="Departure Station:"
+                ref={component => (this.textInputDepartStation = component)}
+              />
+              <TextInput
+                style={styles.textInputStation}
+                placeholder="Destination Station:"
+                ref={component => (this.textInputDestStation = component)}
+              />
+            </View>
+            <Text style={styles.selectDate}>Select Date</Text>
+            <View style={styles.modalButtonsContainer}>
+              <TouchableOpacity onPress={() => this.setModalVisibility(false)}>
+                <Text style={styles.modalButton}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.modalButton}>Add Journey</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
       </View>
@@ -99,7 +117,33 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   modal: {
-    height: 200,
-    backgroundColor: '#687DFC',
+    backgroundColor: 'rgb(104, 126, 252)',
+    borderRadius: 8,
+    padding: 15,
+  },
+  textInputStation: {
+    borderColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 2,
+    height: 50,
+    padding: 10,
+    margin: 5,
+    backgroundColor: '#FFFFFF',
+    fontFamily: 'sans-serif-light',
+  },
+  selectDate: {
+    fontFamily: 'sans-serif-thin',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  modalButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  modalButton: {
+    color: '#FFFFFF',
+    fontFamily: 'sans-serif-medium',
+    margin: 5,
+    fontSize: 15,
   },
 });
