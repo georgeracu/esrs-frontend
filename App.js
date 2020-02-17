@@ -23,12 +23,12 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
-        <Stack.Screen name="Claims" component={ClaimsScreen} />
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Tickets" component={TicketsScreen} />
+        <Stack.Screen name="Claims" component={ClaimsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
