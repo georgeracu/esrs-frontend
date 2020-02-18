@@ -17,7 +17,7 @@ export default class RegisterScreen extends Component {
   constructor(props) {
     super(props);
     this.user = {
-      id: '',
+      id: '1', // Will be updated once the user has been authenticated
       email: '',
       password: '',
       title: '',
@@ -33,6 +33,7 @@ export default class RegisterScreen extends Component {
       title: 'Mr',
     };
     this.isEmailCorrect = false;
+    this.isformComplete = false;
   }
 
   /**
@@ -43,11 +44,14 @@ export default class RegisterScreen extends Component {
   async signUp(email, password) {
     auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(async () => {
+      .then(async credentials => {
         // Persist user's credentials
         await AsyncStorage.setItem('email', email);
         await AsyncStorage.setItem('password', password);
+        // update the user's id with the new one from the firebase auth
+        this.user.id = credentials.user.uid;
         // Make POST request to backend
+        console.log(this.user);
         this.props.navigation.reset({
           index: 0,
           routes: [{name: 'Tickets'}],
@@ -127,14 +131,13 @@ export default class RegisterScreen extends Component {
               placeholder="Password"
               textContentType="password"
               secureTextEntry={true}
-              onChangeText={text => (this.password = text)}
+              onChangeText={text => (this.user.password = text)}
             />
             <TextInput
               style={styles.textInputMultiline}
               placeholder="Address"
               autoCapitalize="words"
               multiline={true}
-              numberOfLines={10}
               onChangeText={text => (this.user.address = text)}
             />
             <TextInput
@@ -197,21 +200,23 @@ export default class RegisterScreen extends Component {
   onSignUp = () => {
     const userKeys = Object.keys(this.user);
     userKeys.every(key => {
-      if (this.user[key] === '') {
-        Alert.alert('Sing Up', 'Please provide all details');
-        return false;
-      }
+      this.isformComplete = this.user[key] !== '';
+      return false;
     });
-    if (!this.isEmailCorrect) {
-      Alert.alert('Sing Up', 'Please provide a valid email');
-    } else if (!validator.isNumeric(this.user.phoneNumber)) {
-      Alert.alert('Sing Up', 'Phone must be number only');
-    } else if (this.user.phoneNumber !== 11) {
-      Alert.alert('Sing Up', 'Phone must be at least 11 characters long');
-    } else if (this.user.password.length < 6) {
-      Alert.alert('Sing Up', 'Password must be at least 6 characters long');
+    if (!this.isformComplete) {
+      Alert.alert('Sing Up', 'Please provide all details');
     } else {
-      this.signUp(this.user.email, this.user.password);
+      if (!this.isEmailCorrect) {
+        Alert.alert('Sing Up', 'Please provide a valid email');
+      } else if (!validator.isNumeric(this.user.phoneNumber)) {
+        Alert.alert('Sing Up', 'Phone must be number only');
+      } else if (this.user.phoneNumber.length !== 11) {
+        Alert.alert('Sing Up', 'Phone must be 11 characters');
+      } else if (this.user.password.length < 6) {
+        Alert.alert('Sing Up', 'Password must be at least 6 characters long');
+      } else {
+        this.signUp(this.user.email, this.user.password);
+      }
     }
   };
 }
