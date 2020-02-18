@@ -287,7 +287,6 @@ const styles = StyleSheet.create({
   scrollView: {
     padding: 20,
     backgroundColor: '#FFFFFF',
-    ...StyleSheet.absoluteFillObject,
   },
   scrollViewContents: {
     marginTop: 10,
