@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {
   Alert,
   AsyncStorage,
+  ScrollView,
+  Picker,
   StyleSheet,
   Text,
   TextInput,
@@ -14,10 +16,24 @@ import auth from '@react-native-firebase/auth';
 export default class RegisterScreen extends Component {
   constructor(props) {
     super(props);
-    this.fullname = '';
-    this.email = '';
-    this.password = '';
+    this.user = {
+      id: '1', // Will be updated once the user has been authenticated
+      email: '',
+      password: '',
+      title: '',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      country: '',
+      address: '',
+      townCity: '',
+      postcode: '',
+    };
+    this.state = {
+      title: 'Mr',
+    };
     this.isEmailCorrect = false;
+    this.isformComplete = false;
   }
 
   /**
@@ -28,11 +44,14 @@ export default class RegisterScreen extends Component {
   async signUp(email, password) {
     auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(async () => {
+      .then(async credentials => {
         // Persist user's credentials
         await AsyncStorage.setItem('email', email);
         await AsyncStorage.setItem('password', password);
+        // update the user's id with the new one from the firebase auth
+        this.user.id = credentials.user.uid;
         // Make POST request to backend
+        console.log(this.user);
         this.props.navigation.reset({
           index: 0,
           routes: [{name: 'Tickets'}],
@@ -54,48 +73,102 @@ export default class RegisterScreen extends Component {
 
   render() {
     return (
-      <View style={styles.root}>
-        <Text style={styles.appName}>REPAYLINE</Text>
-        <View>
-          <Text style={styles.welcomeMessageFirstLine}>Welcome</Text>
-          <Text style={styles.welcomeMessage}>sign up and reclaim</Text>
-          <Text style={styles.welcomeMessage}>your money.</Text>
-        </View>
-        <View>
-          <View>
+      <View style={{flex: 1}}>
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <Text style={styles.appName}>REPAYLINE</Text>
+          <View style={styles.scrollViewContents}>
+            <Text style={styles.welcomeMessageFirstLine}>Welcome</Text>
+            <Text style={styles.welcomeMessage}>sign up and reclaim</Text>
+            <Text style={styles.welcomeMessage}>your money.</Text>
+          </View>
+          <View style={styles.scrollViewContents}>
+            <Picker
+              selectedValue={this.state.title}
+              onValueChange={(itemValue, itemIndex) => {
+                this.user.title = itemValue;
+                this.setState({
+                  title: itemValue,
+                });
+              }}
+              ref={component => (this.refPickerTitle = component)}
+              mode="dropdown">
+              <Picker.Item label="Mr" value="Mr" />
+              <Picker.Item label="Mrs" value="Mrs" />
+              <Picker.Item label="Miss" value="Miss" />
+              <Picker.Item label="Ms" value="Ms" />
+              <Picker.Item label="Mx" value="Mx" />
+              <Picker.Item label="Dr" value="Dr" />
+            </Picker>
             <TextInput
-              style={styles.textInputFullname}
-              placeholder="Fullname"
-              onChangeText={text => (this.fullname = text)}
+              style={styles.textInputTop}
+              placeholder="First name"
+              autoCapitalize="words"
+              textContentType="name"
+              onChangeText={text => (this.user.firstName = text)}
             />
             <TextInput
-              style={styles.textInputEmail}
+              style={styles.textInput}
+              placeholder="Last name"
+              textContentType="name"
+              onChangeText={text => (this.user.lastName = text)}
+            />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Phone number"
+              textContentType="telephoneNumber"
+              ref={component => (this.refTextInputPhone = component)}
+              onChangeText={text => (this.user.phoneNumber = text)}
+            />
+            <TextInput
+              style={styles.textInput}
               placeholder="Email"
-              ref={component => (this.textInputEmail = component)}
+              ref={component => (this.refTextInputEmail = component)}
+              textContentType="emailAddress"
               onChangeText={text => this.onCheckEmailInput(text)}
             />
             <TextInput
-              style={styles.textInputPassword}
+              style={styles.textInput}
               placeholder="Password"
+              textContentType="password"
               secureTextEntry={true}
-              onChangeText={text => (this.password = text)}
+              onChangeText={text => (this.user.password = text)}
             />
+            <TextInput
+              style={styles.textInputMultiline}
+              placeholder="Address"
+              autoCapitalize="words"
+              multiline={true}
+              onChangeText={text => (this.user.address = text)}
+            />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Town/City"
+              autoCapitalize="words"
+              onChangeText={text => (this.user.townCity = text)}
+            />
+            <TextInput
+              style={styles.textInputBottom}
+              placeholder="Postcode"
+              textContentType="postalCode"
+              onChangeText={text => (this.user.postcode = text)}
+            />
+            <TouchableOpacity onPress={this.onSignUp}>
+              <Text style={styles.buttonSignUp}>Sign me up</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={this.onSignUp}>
-            <Text style={styles.buttonSignUp}>Sign me up</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-          <Text style={styles.textRegisterInfo}>
-            By creating an account you agree to our
-          </Text>
-          <Text style={styles.textRegisterInfo}>
-            <Text style={styles.textRegisterInfoLink}>
-              Terms &amp; Conditions
-            </Text>{' '}
-            and <Text style={styles.textRegisterInfoLink}>Privacy Policy</Text>
-          </Text>
-        </View>
+          <View style={styles.scrollViewContents}>
+            <Text style={styles.textRegisterInfo}>
+              By creating an account you agree to our
+            </Text>
+            <Text style={styles.textRegisterInfo}>
+              <Text style={styles.textRegisterInfoLink}>
+                Terms &amp; Conditions
+              </Text>{' '}
+              and{' '}
+              <Text style={styles.textRegisterInfoLink}>Privacy Policy</Text>
+            </Text>
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -105,46 +178,50 @@ export default class RegisterScreen extends Component {
    * @param text containing the email
    */
   onCheckEmailInput(text) {
-    this.email = text;
+    this.user.email = text;
     if (!validator.isEmail(text)) {
       this.isEmailCorrect = false;
-      this.textInputEmail.setNativeProps({
+      this.refTextInputEmail.setNativeProps({
         borderColor: '#DC7575',
         borderWidth: 1,
       });
     } else if (validator.isEmail(text)) {
       this.isEmailCorrect = true;
-      this.textInputEmail.setNativeProps({
+      this.refTextInputEmail.setNativeProps({
         borderColor: '#CCCCCC',
         borderTopWidth: 0,
-        borderBottomWidth: 0,
       });
     }
   }
 
   /**
-   * Validates the fullname, email and password input for empty entries
+   * Validates for empty entries
    */
   onSignUp = () => {
-    if (this.fullname === '' || this.email === '' || this.password === '') {
+    const userKeys = Object.keys(this.user);
+    userKeys.every(key => {
+      this.isformComplete = this.user[key] !== '';
+      return false;
+    });
+    if (!this.isformComplete) {
       Alert.alert('Sing Up', 'Please provide all details');
-    } else if (!this.isEmailCorrect) {
-      Alert.alert('Sing Up', 'Please provide a valid email');
-    } else if (this.password.length < 6) {
-      Alert.alert('Sing Up', 'Password must be at least 6 characters long');
     } else {
-      this.signUp(this.email, this.password);
+      if (!this.isEmailCorrect) {
+        Alert.alert('Sing Up', 'Please provide a valid email');
+      } else if (!validator.isNumeric(this.user.phoneNumber)) {
+        Alert.alert('Sing Up', 'Phone must be number only');
+      } else if (this.user.phoneNumber.length !== 11) {
+        Alert.alert('Sing Up', 'Phone must be 11 characters');
+      } else if (this.user.password.length < 6) {
+        Alert.alert('Sing Up', 'Password must be at least 6 characters long');
+      } else {
+        this.signUp(this.user.email, this.user.password);
+      }
     }
   };
 }
 
 const styles = StyleSheet.create({
-  root: {
-    padding: 20,
-    flex: 1,
-    justifyContent: 'space-around',
-    backgroundColor: '#FFFFFF',
-  },
   appName: {
     fontWeight: 'bold',
     fontSize: 15,
@@ -152,16 +229,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Verdana',
   },
   welcomeMessage: {
-    fontSize: 30,
+    fontSize: 25,
     color: '#CCCCCC',
     fontFamily: 'sans-serif-light',
   },
   welcomeMessageFirstLine: {
     fontFamily: 'sans-serif',
     color: '#CCCCCC',
-    fontSize: 30,
+    fontSize: 25,
   },
-  textInputFullname: {
+  textInputTop: {
     borderColor: '#CCCCCC',
     borderWidth: 1,
     height: 60,
@@ -170,30 +247,40 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  textInputEmail: {
+  textInput: {
     borderColor: '#CCCCCC',
     borderLeftWidth: 1,
     borderRightWidth: 1,
+    borderBottomWidth: 1,
     height: 60,
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  textInputPassword: {
+  textInputMultiline: {
     borderColor: '#CCCCCC',
-    borderWidth: 1,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    height: 100,
+    padding: 20,
+    fontFamily: 'sans-serif-light',
+  },
+  textInputBottom: {
+    borderColor: '#CCCCCC',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
     height: 60,
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
   buttonSignUp: {
     backgroundColor: '#687DFC',
-    borderRadius: 8,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
     color: '#FFFFFF',
     padding: 20,
     textAlign: 'center',
-    marginTop: 30,
   },
   textRegisterInfo: {
     textAlign: 'center',
@@ -201,5 +288,13 @@ const styles = StyleSheet.create({
   textRegisterInfoLink: {
     fontWeight: 'bold',
     color: '#687DFC',
+  },
+  scrollView: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollViewContents: {
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
