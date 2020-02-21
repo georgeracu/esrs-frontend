@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import validator from 'validator';
 import auth from '@react-native-firebase/auth';
+import {sha256} from "react-native-sha256";
 
 export default class LoginScreen extends Component {
   constructor(props) {
@@ -114,7 +115,9 @@ export default class LoginScreen extends Component {
       .then(async () => {
         // Persist user's credentials
         await AsyncStorage.setItem('email', email);
-        await AsyncStorage.setItem('password', password);
+        const hash = await sha256(password);
+        await AsyncStorage.setItem('password', hash);
+        console.log(hash);
         this.props.navigation.reset({
           index: 0,
           routes: [{name: 'Tickets'}],
