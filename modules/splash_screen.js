@@ -3,39 +3,40 @@ import {AsyncStorage, StyleSheet, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 
 const SplashScreen = ({navigation}) => {
-  
   useEffect(() => {
-    async function fetchDetails() {
-      const email = await AsyncStorage.getItem('email');
-      const password = await AsyncStorage.getItem('password');
-      const credential = email + password; // Concatenating empty or null values gives you "" or 0
-      if (credential === '' || credential === 0) {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Login'}],
-        });
-      } else {
-        authUser(email, password);
-      }
-    }
     fetchDetails();
-  }, []);
+  });
+
+  const fetchDetails = async () => {
+    const email = await AsyncStorage.getItem('email');
+    const password = await AsyncStorage.getItem('password');
+    const credential = email + password; // Concatenating empty or null values gives you "" or 0
+    if (credential === '' || credential === 0) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    } else {
+      await authUser(email, password);
+    }
+  };
 
   /**
    * This authenticates a user upon subsequent app launch
    * @param {*} email of the user
    * @param {*} password of the user
    */
-  const authUser = async (em, pass) => {
+  const authUser = async (email, password) => {
     auth()
-      .signInWithEmailAndPassword(em, pass)
+      .signInWithEmailAndPassword(email, password)
       .then(() => {
         navigation.reset({
           index: 0,
           routes: [{name: 'Tickets'}],
         });
       })
-      .catch(() => {
+      .catch(err => {
+        console.log(err);
         navigation.reset({
           index: 0,
           routes: [{name: 'Login'}],
