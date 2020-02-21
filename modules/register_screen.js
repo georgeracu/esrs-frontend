@@ -28,56 +28,10 @@ const RegisterScreen = ({navigation}) => {
     townCity: '',
     postcode: '',
   });
-  const [isEmailCorrect, setIsEmailCorrect] = useState(false);
-  const [isFormComplete, setIsFormComplete] = useState(false);
-
-  /**
-   * Validates email pattern
-   * @param text containing the email
-   */
-  const onCheckEmailInput = (text) => {
-    setUserDetails({...userDetails, email: text});
-    if (!validator.isEmail(text)) {
-      setIsEmailCorrect(false);
-    } else if (validator.isEmail(text)) {
-      setIsEmailCorrect(true);
-    }
-  };
-
-  /**
-   * This creates a new user credential
-   * @param {*} email of the user
-   * @param {*} password of the user
-   */
-  const signUp = async (em, pass) => {
-    auth()
-      .createUserWithEmailAndPassword(em, pass)
-      .then(async credentials => {
-        // Persist user's credentials
-        await AsyncStorage.setItem('email', em);
-        await AsyncStorage.setItem('password', pass);
-        // update the user's id with the new one from the firebase auth
-        setUserDetails({...userDetails, id: credentials.user.uid});
-        // Make POST request to backend
-        console.log(userDetails);
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Tickets'}],
-        });
-      })
-      .catch(error => {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            Alert.alert('Sign Up', `Hey, ${em} is already in use`);
-            break;
-          case 'auth/invalid-email':
-            Alert.alert('Sign Up', `Hey, ${em} is invalid`);
-            break;
-          default:
-          // Do nothing for now
-        }
-      });
-  };
+  const [isEmailCorrect, toggleIsEmailCorrect] = useState(true);
+  const [isFormComplete, toggleIsFormComplete] = useState(false);
+  const [signUpBtnTxt, toggleSignUpBtnTxt] = useState('Sign me up');
+  const [isSigningUp, toggleSignUpState] = useState(false);
 
   /**
    * Validates for empty entries
@@ -85,7 +39,7 @@ const RegisterScreen = ({navigation}) => {
   const onSignUp = () => {
     const userKeys = Object.keys(userDetails);
     userKeys.every(key => {
-      setIsFormComplete(userDetails[key] !== '');
+      toggleIsFormComplete(userDetails[key] !== '');
       return false;
     });
     if (!isFormComplete) {
@@ -100,9 +54,51 @@ const RegisterScreen = ({navigation}) => {
       } else if (userDetails.password.length < 6) {
         Alert.alert('Sing Up', 'Password must be at least 6 characters long');
       } else {
-        signUp(userDetails.email, userDetails.password);
+        if (!isSigningUp) {
+          signUp(userDetails.email, userDetails.password);
+        }
       }
     }
+  };
+
+  /**
+   * This creates a new user credential
+   * @param {*} email of the user
+   * @param {*} password of the user
+   */
+  const signUp = async (email, password) => {
+    toggleSignUpBtnTxt('Signing Up');
+    toggleSignUpState(true);
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(async credentials => {
+        // Persist user's credentials
+        await AsyncStorage.setItem('id', credentials.user.uid);
+        await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('password', password);
+        // update the user's id with the new one from the firebase auth
+        setUserDetails({...userDetails, id: credentials.user.uid});
+        // Make POST request to backend
+        console.log(userDetails);
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Tickets'}],
+        });
+      })
+      .catch(error => {
+        toggleSignUpBtnTxt('Sign me up');
+        toggleSignUpState(false);
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            Alert.alert('Sign Up', `Hey, ${email} is already in use`);
+            break;
+          case 'auth/invalid-email':
+            Alert.alert('Sign Up', `Hey, ${email} is invalid`);
+            break;
+          default:
+          // Do nothing for now
+        }
+      });
   };
 
   return (
@@ -110,13 +106,12 @@ const RegisterScreen = ({navigation}) => {
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Text style={styles.appName}>REPAYLINE</Text>
         <View style={styles.scrollViewContents}>
-          <Text style={styles.welcomeMessageFirstLine}>Welcome</Text>
+          <Text style={styles.welcomeMessageFirstLine}>Welcome,</Text>
           <Text style={styles.welcomeMessage}>sign up and reclaim</Text>
           <Text style={styles.welcomeMessage}>your money.</Text>
         </View>
         <View style={styles.scrollViewContents}>
           <Picker
-            selectedValue="Mr"
             onValueChange={(itemValue, itemIndex) => {
               setUserDetails({...userDetails, title: itemValue});
             }}
@@ -128,59 +123,71 @@ const RegisterScreen = ({navigation}) => {
             <Picker.Item label="Mx" value="Mx" />
             <Picker.Item label="Dr" value="Dr" />
           </Picker>
+          <View style={styles.container_first_last_name}>
+            <TextInput
+                style={[styles.text_input_name, {borderRightWidth: 1, borderColor: '#CCCCCC'}]}
+                placeholder="First name"
+                autoCapitalize="words"
+                textContentType="name"
+                onChangeText={text => setUserDetails({...userDetails, firstName: text})}
+            />
+            <TextInput
+                style={styles.text_input_name}
+                placeholder="Last name"
+                autoCapitalize="words"
+                textContentType="name"
+                onChangeText={text => setUserDetails({...userDetails, lastName: text})}
+            />
+          </View>
           <TextInput
-            style={styles.textInputTop}
-            placeholder="First name"
-            autoCapitalize="words"
-            textContentType="name"
-            onChangeText={text => setUserDetails({...userDetails, firstName: text})}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Last name"
-            textContentType="name"
-            onChangeText={text => setUserDetails({...userDetails, lastName: text})}
-          />
-          <TextInput
-            style={styles.textInput}
+            style={styles.text_input}
             placeholder="Phone number"
             textContentType="telephoneNumber"
             onChangeText={text => setUserDetails({...userDetails, phoneNumber: text})}
           />
           <TextInput
-            style={[styles.textInput, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575', borderWidth: isEmailCorrect ? 1 : 0}]}
+            style={[styles.text_input, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575'}]}
             placeholder="Email"
             textContentType="emailAddress"
-            onChangeText={text => onCheckEmailInput(text)}
+            onChangeText={text => {
+              setUserDetails({...userDetails, email: text});
+              if (!validator.isEmail(text)) {
+                toggleIsEmailCorrect(false);
+              } else if (validator.isEmail(text)) {
+                toggleIsEmailCorrect(true);
+              }
+            }}
           />
           <TextInput
-            style={styles.textInput}
-            placeholder="Password"
+            style={styles.text_input}
+            placeholder="Password must be above 5 characters"
             textContentType="password"
             secureTextEntry={true}
             onChangeText={text => setUserDetails({...userDetails, password: text})}
           />
           <TextInput
-            style={styles.textInputMultiline}
+            style={styles.text_input_multiline}
             placeholder="Address"
             autoCapitalize="words"
             multiline={true}
             onChangeText={text => setUserDetails({...userDetails, address: text})}
           />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Town/City"
-            autoCapitalize="words"
-            onChangeText={text => setUserDetails({...userDetails, townCity: text})}
-          />
-          <TextInput
-            style={styles.textInputBottom}
-            placeholder="Postcode"
-            textContentType="postalCode"
-            onChangeText={text => setUserDetails({...userDetails, postcode: text})}
-          />
+          <View style={styles.container_town_city_postcode}>
+            <TextInput
+                style={[styles.text_input_town_city_postcode, {borderRightWidth: 1, borderColor: '#CCCCCC'}]}
+                placeholder="Town/City"
+                autoCapitalize="words"
+                onChangeText={text => setUserDetails({...userDetails, townCity: text})}
+            />
+            <TextInput
+                style={styles.text_input_town_city_postcode}
+                placeholder="Postcode"
+                textContentType="postalCode"
+                onChangeText={text => setUserDetails({...userDetails, postcode: text})}
+            />
+          </View>
           <TouchableOpacity onPress={onSignUp}>
-            <Text style={styles.buttonSignUp}>Sign me up</Text>
+            <Text style={styles.buttonSignUp}>{signUpBtnTxt}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.scrollViewContents}>
@@ -219,16 +226,35 @@ const styles = StyleSheet.create({
     color: '#CCCCCC',
     fontSize: 25,
   },
-  textInputTop: {
-    borderColor: '#CCCCCC',
+  container_first_last_name:  {
+    flexDirection: 'row',
     borderWidth: 1,
-    height: 60,
+    borderColor: '#CCCCCC',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
-    padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  textInput: {
+  text_input_name: {
+    height: 60,
+    padding: 20,
+    flexBasis: 1,
+    flexGrow: 1,
+  },
+  container_town_city_postcode:  {
+    flexDirection: 'row',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#CCCCCC',
+    fontFamily: 'sans-serif-light',
+  },
+  text_input_town_city_postcode: {
+    height: 60,
+    padding: 20,
+    flexBasis: 1,
+    flexGrow: 1,
+  },
+  text_input: {
     borderColor: '#CCCCCC',
     borderLeftWidth: 1,
     borderRightWidth: 1,
@@ -237,21 +263,13 @@ const styles = StyleSheet.create({
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
-  textInputMultiline: {
+  text_input_multiline: {
     borderColor: '#CCCCCC',
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     height: 100,
-    padding: 20,
-    fontFamily: 'sans-serif-light',
-  },
-  textInputBottom: {
-    borderColor: '#CCCCCC',
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderBottomWidth: 1,
-    height: 60,
+    textAlignVertical: 'top',
     padding: 20,
     fontFamily: 'sans-serif-light',
   },
@@ -271,11 +289,10 @@ const styles = StyleSheet.create({
     color: '#687DFC',
   },
   scrollView: {
-    padding: 20,
     backgroundColor: '#FFFFFF',
+    padding: 20,
   },
   scrollViewContents: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 20,
   },
 });

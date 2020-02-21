@@ -15,20 +15,9 @@ import auth from '@react-native-firebase/auth';
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isEmailCorrect, setIsEmailCorrect] = useState(false);
-
-  /**
-   * Validates email pattern
-   * @param text containing the email
-   */
-  const onCheckEmailInput = (text) => {
-    setEmail(text);
-    if (!validator.isEmail(text)) {
-      setIsEmailCorrect(false);
-    } else if (validator.isEmail(text)) {
-      setIsEmailCorrect(true);
-    }
-  };
+  const [isEmailCorrect, toggleIsEmailCorrect] = useState(true);
+  const [LogInBtnTxt, toggleLogInBtnTxt] = useState('Log me in');
+  const [isLoggingIn, toggleLoginState] = useState(false);
 
   /**
    * Validates the email and password input for empty entries
@@ -39,93 +28,105 @@ const LoginScreen = ({navigation}) => {
     } else if (!isEmailCorrect) {
       Alert.alert('Sign In', 'Please provide a valid email');
     } else {
-      authUser(email, password);
+      if (!isLoggingIn) {
+        await authUser();
+      }
     }
   };
 
   /**
    * This authenticates a user upon sign in
-   * @param {*} email of the user
-   * @param {*} password of the user
    */
-  const authUser = async (em, pass) => {
+  const authUser = async () => {
+    toggleLogInBtnTxt('Logging In');
+    toggleLoginState(true);
     auth()
-      .signInWithEmailAndPassword(em, pass)
-      .then(async () => {
-        // Persist user's credentials
-        await AsyncStorage.setItem('email', em);
-        await AsyncStorage.setItem('password', pass);
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Tickets'}],
+        .signInWithEmailAndPassword(email, password)
+        .then(async (credentials) => {
+          // Persist user's credentials
+          await AsyncStorage.setItem('id', credentials.user.uid);
+          await AsyncStorage.setItem('email', email);
+          await AsyncStorage.setItem('password', password);
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Tickets'}],
+          });
+        })
+        .catch(error => {
+          toggleLogInBtnTxt('Log me in');
+          toggleLoginState(false);
+          switch (error.code) {
+            case 'auth/user-not-found':
+              Alert.alert(
+                  'Sign In',
+                  "Sorry, you don't have an account, please sign up for one",
+              );
+              break;
+            case 'auth/invalid-email':
+              Alert.alert('Sign In', `Hey, ${email} is invalid`);
+              break;
+            case 'auth/wrong-password':
+              Alert.alert('Sign In', 'Hey, looks like your password is wrong');
+              break;
+            default:
+              // Do nothing
+          }
         });
-      })
-      .catch(error => {
-        switch (error.code) {
-          case 'auth/user-not-found':
-            Alert.alert(
-              'Sign In',
-              "Sorry, you don't have an account, please sign up for one",
-            );
-            break;
-          case 'auth/invalid-email':
-            Alert.alert('Sign In', `Hey, ${em} is invalid`);
-            break;
-          case 'auth/wrong-password':
-            Alert.alert('Sign In', 'Hey, looks like your password is wrong');
-            break;
-          default:
-          // Do nothing
-        }
-      });
   };
 
   return (
-    <View style={styles.root}>
-      <Text style={styles.appName}>REPAYLINE</Text>
-      <View>
-        <Text style={styles.welcomeMessageFirstLine}>Hi there</Text>
-        <Text style={styles.welcomeMessage}>please login</Text>
-        <Text style={styles.welcomeMessage}>to your account.</Text>
-      </View>
-      <View>
+      <View style={styles.root}>
+        <Text style={styles.appName}>REPAYLINE</Text>
         <View>
-          <TextInput
-            style={[styles.textInputEmail, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575'}]}
-            placeholder="Email"
-            defaultValue={email}
-            onChangeText={text => onCheckEmailInput(text)}
-          />
-          <TextInput
-            style={styles.textInputPassword}
-            placeholder="Password"
-            secureTextEntry={true}
-            onChangeText={text => setPassword(text)}
-          />
+          <Text style={styles.welcomeMessageFirstLine}>Hi there</Text>
+          <Text style={styles.welcomeMessage}>please login</Text>
+          <Text style={styles.welcomeMessage}>to your account.</Text>
         </View>
-        <TouchableOpacity onPress={onLogin}>
-          <Text style={styles.buttonLogIn}>Log me in</Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        <Text style={styles.textLoginInfo}>
-          Forgot password?{' '}
-          <Text
-            style={styles.textLoginInfoLink}
-            onPress={() => navigation.navigate('ForgotPassword')}>
-            Get it now
+        <View>
+          <View>
+            <TextInput
+                style={[styles.textInputEmail, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575'}]}
+                placeholder="Email"
+                defaultValue={email}
+                onChangeText={text => {
+                  setEmail(text);
+                  if (!validator.isEmail(text)) {
+                    toggleIsEmailCorrect(false);
+                  } else if (validator.isEmail(text)) {
+                    toggleIsEmailCorrect(true);
+                  }
+                }}
+            />
+            <TextInput
+                style={styles.textInputPassword}
+                placeholder="Password must be above 5 characters"
+                secureTextEntry={true}
+                onChangeText={text => setPassword(text)}
+            />
+          </View>
+          <TouchableOpacity onPress={onLogin}>
+            <Text style={styles.buttonLogIn}>{LogInBtnTxt}</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text style={styles.textLoginInfo}>
+            Forgot password?{' '}
+            <Text
+                style={styles.textLoginInfoLink}
+                onPress={() => navigation.navigate('ForgotPassword')}>
+              Get it now
+            </Text>
           </Text>
-        </Text>
-        <Text style={styles.textLoginInfo}>
-          Don't have an account?{' '}
-          <Text
-            style={styles.textLoginInfoLink}
-            onPress={() => navigation.navigate('Register')}>
-            Sign up now
+          <Text style={styles.textLoginInfo}>
+            Don't have an account?{' '}
+            <Text
+                style={styles.textLoginInfoLink}
+                onPress={() => navigation.navigate('Register')}>
+              Sign up now
+            </Text>
           </Text>
-        </Text>
+        </View>
       </View>
-    </View>
   );
 };
 
