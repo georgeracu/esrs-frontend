@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -173,8 +174,21 @@ const TicketsScreen = ({navigation}) => {
             <TouchableOpacity
               style={styles.modalButtonRight}
               onPress={() => {
-                addJourney();
-                setModalVisibility(false);
+                if (
+                  journeyFrom === '' ||
+                  journeyTo === '' ||
+                  journeyDateTime === 'Select a date'
+                ) {
+                  Alert.alert(
+                    'Add Journey',
+                    'Oops, looks like you are missing something',
+                  );
+                } else {
+                  addJourney();
+                  setJourneyFrom('');
+                  setJourneyTo('');
+                  setModalVisibility(false);
+                }
               }}>
               <Text style={styles.textModalButton}>Add Journey</Text>
             </TouchableOpacity>
