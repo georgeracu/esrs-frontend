@@ -150,7 +150,6 @@ const TicketsScreen = ({navigation}) => {
               <Text
                 style={styles.listItem}
                 onPress={() => {
-                  console.log(stationsAndCodes.get(item));
                   journeyLocation === 'JF'
                     ? setJourneyFrom(stationsAndCodes.get(item))
                     : setJourneyTo(stationsAndCodes.get(item));
