@@ -116,18 +116,28 @@ const TicketsScreen = ({navigation}) => {
               onChangeText={text => search(text)}
             />
           </View>
+          <View style={styles.dateContainer}>
+            <Image style={styles.dateIcon} source={require('../resources/date.png')} />
+            <Text style={styles.dateText}>Select a date</Text>
+          </View>
           <FlatList
             data={stationsSuggestions}
+            keyExtractor={station => station}
             renderItem={({item}) => <Text style={styles.listItem}>{item}</Text>}
           />
           <Text style={styles.selectDate}>Select Date</Text>
           <View style={styles.modalButtonsContainer}>
-            <TouchableOpacity style={styles.modalButtonLeft} onPress={() => setModalVisibility(false)}>
+            <TouchableOpacity
+              style={styles.modalButtonLeft}
+              onPress={() => {
+                setStationsSuggestions([]);
+                setModalVisibility(false);
+              }}>
               <Text style={styles.textModalButton}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-                style={styles.modalButtonRight}
-                onPress={() => {
+              style={styles.modalButtonRight}
+              onPress={() => {
                 addJourney();
                 setModalVisibility(false);
               }}>
@@ -190,7 +200,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   modal: {
-
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
   },
   textInputStationLeft: {
     height: 60,
@@ -216,14 +227,13 @@ const styles = StyleSheet.create({
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-
   },
   modalButtonLeft: {
     color: '#FFFFFF',
     backgroundColor: '#3c3c3d',
     flexBasis: 1,
     flexGrow: 1,
-    padding: 10,
+    padding: 20,
     fontFamily: 'sans-serif-medium',
     fontSize: 15,
     borderBottomLeftRadius: 8,
@@ -233,7 +243,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#687DFC',
     flexBasis: 1,
     flexGrow: 1,
-    padding: 10,
+    padding: 20,
     fontFamily: 'sans-serif-medium',
     fontSize: 15,
     borderBottomRightRadius: 8,
@@ -272,8 +282,10 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   listItem: {
-    margin: 5,
-    color: '#FFFFFF',
+    marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    color: '#000000',
   },
   departDestContainer: {
     flexDirection: 'row',
@@ -285,5 +297,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     fontFamily: 'sans-serif-medium',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateIcon: {
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  dateText: {
+    fontFamily: 'sans-serif-thin',
   },
 });
