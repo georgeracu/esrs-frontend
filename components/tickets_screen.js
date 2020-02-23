@@ -17,6 +17,32 @@ const TicketsScreen = ({navigation}) => {
     isModalVisible: false,
     journeys: [],
   });
+  const [stationsSuggestions, setStationsSuggestions] = useState([]);
+
+  const stationsAndCodesJson = require('../resources/stations_and_codes');
+  const stationsAndCodes = new Map();
+  stationsAndCodesJson.forEach(stationAndCode => {
+    stationsAndCodes.set(
+      stationAndCode.key.toLowerCase(),
+      stationAndCode.value,
+    );
+  });
+  const stations = Array.from(stationsAndCodes.keys());
+
+  /**
+   * Returns matching stations
+   * @param stationName
+   */
+  const search = stationName => {
+    const results = stations.filter(station => {
+      return station.startsWith(stationName.toLowerCase());
+    });
+    if (stationName === '') {
+      setStationsSuggestions([]);
+    } else {
+      setStationsSuggestions(results.slice(0, 5));
+    }
+  };
 
   /**
    * Toggles the visibility of the modal
@@ -78,29 +104,34 @@ const TicketsScreen = ({navigation}) => {
       </TouchableOpacity>
       <Modal isVisible={display.isModalVisible} hasBackdrop={false}>
         <View style={styles.modal}>
-          <View>
+          <View style={styles.departDestContainer}>
             <TextInput
-              style={styles.textInputStation}
+              style={styles.textInputStationLeft}
               placeholder="Departure Station:"
-              onChangeText={text => setJourneyFrom(text)}
+              onChangeText={text => search(text)}
             />
             <TextInput
-              style={styles.textInputStation}
+              style={styles.textInputStationRight}
               placeholder="Destination Station:"
-              onChangeText={text => setJourneyTo(text)}
+              onChangeText={text => search(text)}
             />
           </View>
+          <FlatList
+            data={stationsSuggestions}
+            renderItem={({item}) => <Text style={styles.listItem}>{item}</Text>}
+          />
           <Text style={styles.selectDate}>Select Date</Text>
           <View style={styles.modalButtonsContainer}>
-            <TouchableOpacity onPress={() => setModalVisibility(false)}>
-              <Text style={styles.modalButton}>Cancel</Text>
+            <TouchableOpacity style={styles.modalButtonLeft} onPress={() => setModalVisibility(false)}>
+              <Text style={styles.textModalButton}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
+                style={styles.modalButtonRight}
+                onPress={() => {
                 addJourney();
                 setModalVisibility(false);
               }}>
-              <Text style={styles.modalButton}>Add Journey</Text>
+              <Text style={styles.textModalButton}>Add Journey</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -159,19 +190,23 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   modal: {
-    backgroundColor: 'rgb(104, 126, 252)',
-    borderRadius: 8,
-    padding: 15,
+
   },
-  textInputStation: {
-    borderColor: '#FFFFFF',
-    borderRadius: 8,
-    borderWidth: 2,
-    height: 50,
-    padding: 10,
-    margin: 5,
+  textInputStationLeft: {
+    height: 60,
+    padding: 20,
+    flexBasis: 1,
+    flexGrow: 1,
     backgroundColor: '#FFFFFF',
-    fontFamily: 'sans-serif-light',
+    borderTopLeftRadius: 8,
+  },
+  textInputStationRight: {
+    height: 60,
+    padding: 20,
+    flexBasis: 1,
+    flexGrow: 1,
+    backgroundColor: '#FFFFFF',
+    borderTopRightRadius: 8,
   },
   selectDate: {
     fontFamily: 'sans-serif-thin',
@@ -181,12 +216,27 @@ const styles = StyleSheet.create({
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+
   },
-  modalButton: {
+  modalButtonLeft: {
     color: '#FFFFFF',
+    backgroundColor: '#3c3c3d',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 10,
     fontFamily: 'sans-serif-medium',
-    margin: 5,
     fontSize: 15,
+    borderBottomLeftRadius: 8,
+  },
+  modalButtonRight: {
+    color: '#FFFFFF',
+    backgroundColor: '#687DFC',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 10,
+    fontFamily: 'sans-serif-medium',
+    fontSize: 15,
+    borderBottomRightRadius: 8,
   },
   journeyView: {
     flexDirection: 'row',
@@ -220,5 +270,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     alignContent: 'center',
+  },
+  listItem: {
+    margin: 5,
+    color: '#FFFFFF',
+  },
+  departDestContainer: {
+    flexDirection: 'row',
+    borderColor: '#FFFFFF',
+    borderRadius: 8,
+    fontFamily: 'sans-serif-light',
+  },
+  textModalButton: {
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontFamily: 'sans-serif-medium',
   },
 });
