@@ -9,10 +9,18 @@ import {
   View,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 const TicketsScreen = ({navigation}) => {
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
+  const [journeyDateTime, setJourneyDateTime] = useState('Select a date');
+  const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
+
+  const [dateTimeMode, toggleDateTimeMode] = useState('date');
+  const [shouldShowDateTime, toggleShowDateTime] = useState(false);
+
   const [display, setDisplay] = useState({
     isModalVisible: false,
     journeys: [],
@@ -34,6 +42,9 @@ const TicketsScreen = ({navigation}) => {
    * @param stationName
    */
   const search = stationName => {
+    journeyLocation === 'JF'
+      ? setJourneyFrom(stationName)
+      : setJourneyTo(stationName);
     const results = stations.filter(station => {
       return station.startsWith(stationName.toLowerCase());
     });
@@ -102,35 +113,60 @@ const TicketsScreen = ({navigation}) => {
         }}>
         <Text style={styles.textPlusSymbol}>+</Text>
       </TouchableOpacity>
-      <Modal isVisible={display.isModalVisible} hasBackdrop={false}>
+      <Modal isVisible={display.isModalVisible}>
         <View style={styles.modal}>
-          <View style={styles.departDestContainer}>
+          <View style={styles.textInputContainer}>
             <TextInput
+              value={journeyFrom}
               style={styles.textInputStationLeft}
               placeholder="Departure Station:"
               onChangeText={text => search(text)}
+              onFocus={() => toggleJourneyLocation('JF')}
             />
             <TextInput
+              value={journeyTo}
               style={styles.textInputStationRight}
               placeholder="Destination Station:"
               onChangeText={text => search(text)}
+              onFocus={() => toggleJourneyLocation('JT')}
             />
           </View>
           <View style={styles.dateContainer}>
-            <Image style={styles.dateIcon} source={require('../resources/date.png')} />
-            <Text style={styles.dateText}>Select a date</Text>
+            <Image
+              style={styles.dateIcon}
+              source={require('../resources/date.png')}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                toggleShowDateTime(true);
+              }}>
+              <Text style={styles.dateText}>{journeyDateTime}</Text>
+            </TouchableOpacity>
           </View>
           <FlatList
             data={stationsSuggestions}
             keyExtractor={station => station}
-            renderItem={({item}) => <Text style={styles.listItem}>{item}</Text>}
+            renderItem={({item}) => (
+              <Text
+                style={styles.listItem}
+                onPress={() => {
+                  console.log(stationsAndCodes.get(item));
+                  journeyLocation === 'JF'
+                    ? setJourneyFrom(stationsAndCodes.get(item))
+                    : setJourneyTo(stationsAndCodes.get(item));
+                  setStationsSuggestions([]);
+                }}>
+                {item}
+              </Text>
+            )}
           />
-          <Text style={styles.selectDate}>Select Date</Text>
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
               onPress={() => {
                 setStationsSuggestions([]);
+                setJourneyFrom('');
+                setJourneyTo('');
                 setModalVisibility(false);
               }}>
               <Text style={styles.textModalButton}>Cancel</Text>
@@ -146,6 +182,31 @@ const TicketsScreen = ({navigation}) => {
           </View>
         </View>
       </Modal>
+      {shouldShowDateTime && (
+        <DateTimePicker
+          timeZoneOffsetInMinutes={0}
+          value={new Date()}
+          mode={dateTimeMode}
+          is24Hour={true}
+          display="default"
+          onChange={(event, newDate) => {
+            if (event.type === 'dismissed') {
+              toggleShowDateTime(false);
+              toggleDateTimeMode('date');
+            } else {
+              if (dateTimeMode === 'date') {
+                toggleShowDateTime(false);
+                toggleDateTimeMode('time');
+                toggleShowDateTime(true);
+              } else if (dateTimeMode === 'time') {
+                toggleShowDateTime(false);
+                toggleDateTimeMode('date');
+                setJourneyDateTime(moment(newDate).format('DD-MM-YYYY HH:mm'));
+              }
+            }
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -203,11 +264,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
   },
+  textInputContainer: {
+    flexDirection: 'row',
+    borderBottomColor: '#CCCCCC',
+    borderBottomWidth: 1,
+    fontFamily: 'sans-serif-light',
+  },
   textInputStationLeft: {
     height: 60,
     padding: 20,
     flexBasis: 1,
     flexGrow: 1,
+    borderRightColor: '#CCCCCC',
+    borderRightWidth: 1,
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 8,
   },
@@ -283,15 +352,10 @@ const styles = StyleSheet.create({
   },
   listItem: {
     marginTop: 10,
+    marginBottom: 10,
     marginLeft: 20,
     marginRight: 20,
     color: '#000000',
-  },
-  departDestContainer: {
-    flexDirection: 'row',
-    borderColor: '#FFFFFF',
-    borderRadius: 8,
-    fontFamily: 'sans-serif-light',
   },
   textModalButton: {
     color: '#FFFFFF',
@@ -301,6 +365,8 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 15,
   },
   dateIcon: {
     marginLeft: 20,
