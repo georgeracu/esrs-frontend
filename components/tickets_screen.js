@@ -17,7 +17,12 @@ import moment from 'moment';
 const TicketsScreen = ({navigation}) => {
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
-  const [journeyDateTime, setJourneyDateTime] = useState('Select a date');
+  const [journeyDate, setJourneyDate] = useState(
+    moment(new Date()).format('DD-MM-YYYY'),
+  );
+  const [journeyTime, setJourneyTime] = useState(
+    moment(new Date()).format('HH:mm'),
+  );
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
@@ -77,7 +82,7 @@ const TicketsScreen = ({navigation}) => {
       id: Math.random().toString(),
       from: journeyFrom,
       to: journeyTo,
-      dateTime: journeyDateTime,
+      dateTime: `${journeyDate} ${journeyTime}`,
     };
     journeys.push(journey);
     AsyncStorage.setItem('journeys', JSON.stringify(journeys));
@@ -105,7 +110,6 @@ const TicketsScreen = ({navigation}) => {
               navigation.navigate('TicketDashboard', {
                 journeyFrom,
                 journeyTo,
-                journeyDateTime,
               })
             }>
             <View style={styles.journeyView}>
@@ -173,7 +177,9 @@ const TicketsScreen = ({navigation}) => {
               onPress={() => {
                 toggleShowDateTime(true);
               }}>
-              <Text style={styles.dateText}>{journeyDateTime}</Text>
+              <Text style={styles.dateText}>
+                {journeyDate + ' ' + journeyTime}
+              </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.modalButtonsContainer}>
@@ -183,7 +189,8 @@ const TicketsScreen = ({navigation}) => {
                 setStationsSuggestions([]);
                 setJourneyFrom('');
                 setJourneyTo('');
-                setJourneyDateTime('Select a date');
+                setJourneyDate('');
+                setJourneyTime('');
                 toggleModalVisibility(false);
               }}>
               <Text style={styles.textModalButton}>Cancel</Text>
@@ -193,8 +200,7 @@ const TicketsScreen = ({navigation}) => {
               onPress={() => {
                 if (
                   !stationsCodes.includes(journeyFrom) ||
-                  !stationsCodes.includes(journeyTo) ||
-                  journeyDateTime === 'Select a date'
+                  !stationsCodes.includes(journeyTo)
                 ) {
                   Alert.alert(
                     'Add Journey',
@@ -204,7 +210,8 @@ const TicketsScreen = ({navigation}) => {
                   addJourney();
                   setJourneyFrom('');
                   setJourneyTo('');
-                  setJourneyDateTime('Select a date');
+                  setJourneyDate(moment(new Date()).format('DD-MM-YYY'));
+                  setJourneyTime(moment(new Date()).format('HH:mm'));
                   toggleModalVisibility(false);
                 }
               }}>
@@ -221,7 +228,6 @@ const TicketsScreen = ({navigation}) => {
           is24Hour={true}
           display="default"
           onChange={(event, newDate) => {
-            console.log('Help!');
             if (event.type === 'dismissed') {
               toggleShowDateTime(false);
               toggleDateTimeMode('date');
@@ -230,13 +236,11 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
-                setJourneyDateTime(moment(newDate).format('DD-MM-YYYY'));
+                setJourneyDate(moment(newDate).format('DD-MM-YYY'));
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
-                const date = journeyDateTime;
-                const time = moment(newDate).format('HH:mm');
-                setJourneyDateTime(`${date} ${time}`);
+                setJourneyTime(moment(newDate).format('HH:mm'));
               }
             }
           }}
