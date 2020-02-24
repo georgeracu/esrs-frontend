@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Alert,
+  AsyncStorage,
   FlatList,
   Image,
   StyleSheet,
@@ -22,10 +23,21 @@ const TicketsScreen = ({navigation}) => {
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
   const [shouldShowDateTime, toggleShowDateTime] = useState(false);
 
-  const [display, setDisplay] = useState({
-    isModalVisible: false,
-    journeys: [],
-  });
+  const [isModalVisible, toggleModalVisibility] = useState(false);
+
+  const [journeys, setJourneys] = useState([]);
+
+  useEffect(() => {
+    async function getPersistedJourneys() {
+      const persistedJourneys = await AsyncStorage.getItem('journeys');
+      if (persistedJourneys != null) {
+        setJourneys(JSON.parse(persistedJourneys));
+        console.log(JSON.parse(persistedJourneys));
+      }
+    }
+    getPersistedJourneys();
+  }, []);
+
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
   const stationsAndCodesJson = require('../resources/stations_and_codes');
@@ -37,6 +49,7 @@ const TicketsScreen = ({navigation}) => {
     );
   });
   const stations = Array.from(stationsAndCodes.keys());
+  const stationsCodes = Array.from(stationsAndCodes.values());
 
   /**
    * Returns matching stations
@@ -57,14 +70,6 @@ const TicketsScreen = ({navigation}) => {
   };
 
   /**
-   * Toggles the visibility of the modal
-   * @param isVisible
-   */
-  const setModalVisibility = isVisible => {
-    setDisplay({isModalVisible: isVisible, journeys: display.journeys});
-  };
-
-  /**
    * Adds a new journey
    */
   const addJourney = () => {
@@ -72,10 +77,10 @@ const TicketsScreen = ({navigation}) => {
       id: Math.random().toString(),
       from: journeyFrom,
       to: journeyTo,
+      dateTime: journeyDateTime,
     };
-    const journeys = display.journeys;
     journeys.push(journey);
-    setDisplay({isModalVisible: display.isModalVisible, ...journeys});
+    AsyncStorage.setItem('journeys', JSON.stringify(journeys));
   };
 
   return (
@@ -92,29 +97,40 @@ const TicketsScreen = ({navigation}) => {
         />
       </View>
       <FlatList
-        data={display.journeys}
+        data={journeys}
         keyExtractor={journey => journey.id}
-        renderItem={({item}) => (
-          <View style={styles.journeyView}>
-            <View style={styles.imageTrainLogoContainer}>
-              <Image source={require('../resources/train_placeholder.png')} />
+        renderItem={({item, index}) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('TicketDashboard', {
+                journeyFrom,
+                journeyTo,
+                journeyDateTime,
+              })
+            }>
+            <View style={styles.journeyView}>
+              <View style={styles.imageTrainLogoContainer}>
+                <Image source={require('../resources/train_placeholder.png')} />
+              </View>
+              <View style={styles.journeyDetails}>
+                <Text>{item.from}</Text>
+                <Image
+                  source={require('../resources/arrow-circle-right.png')}
+                />
+                <Text>{item.to}</Text>
+              </View>
             </View>
-            <View style={styles.journeyDetails}>
-              <Text>{item.from}</Text>
-              <Image source={require('../resources/arrow-circle-right.png')} />
-              <Text>{item.to}</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
-          setModalVisibility(!display.isModalVisible);
+          toggleModalVisibility(!isModalVisible);
         }}>
         <Text style={styles.textPlusSymbol}>+</Text>
       </TouchableOpacity>
-      <Modal isVisible={display.isModalVisible}>
+      <Modal isVisible={isModalVisible}>
         <View style={styles.modal}>
           <View style={styles.textInputContainer}>
             <TextInput
@@ -132,18 +148,6 @@ const TicketsScreen = ({navigation}) => {
               onFocus={() => toggleJourneyLocation('JT')}
             />
           </View>
-          <View style={styles.dateContainer}>
-            <Image
-              style={styles.dateIcon}
-              source={require('../resources/date.png')}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                toggleShowDateTime(true);
-              }}>
-              <Text style={styles.dateText}>{journeyDateTime}</Text>
-            </TouchableOpacity>
-          </View>
           <FlatList
             data={stationsSuggestions}
             keyExtractor={station => station}
@@ -160,6 +164,18 @@ const TicketsScreen = ({navigation}) => {
               </Text>
             )}
           />
+          <View style={styles.dateContainer}>
+            <Image
+              style={styles.dateIcon}
+              source={require('../resources/date.png')}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                toggleShowDateTime(true);
+              }}>
+              <Text style={styles.dateText}>{journeyDateTime}</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
@@ -167,7 +183,8 @@ const TicketsScreen = ({navigation}) => {
                 setStationsSuggestions([]);
                 setJourneyFrom('');
                 setJourneyTo('');
-                setModalVisibility(false);
+                setJourneyDateTime('Select a date');
+                toggleModalVisibility(false);
               }}>
               <Text style={styles.textModalButton}>Cancel</Text>
             </TouchableOpacity>
@@ -175,8 +192,8 @@ const TicketsScreen = ({navigation}) => {
               style={styles.modalButtonRight}
               onPress={() => {
                 if (
-                  journeyFrom === '' ||
-                  journeyTo === '' ||
+                  !stationsCodes.includes(journeyFrom) ||
+                  !stationsCodes.includes(journeyTo) ||
                   journeyDateTime === 'Select a date'
                 ) {
                   Alert.alert(
@@ -187,7 +204,8 @@ const TicketsScreen = ({navigation}) => {
                   addJourney();
                   setJourneyFrom('');
                   setJourneyTo('');
-                  setModalVisibility(false);
+                  setJourneyDateTime('Select a date');
+                  toggleModalVisibility(false);
                 }
               }}>
               <Text style={styles.textModalButton}>Add Journey</Text>
@@ -203,6 +221,7 @@ const TicketsScreen = ({navigation}) => {
           is24Hour={true}
           display="default"
           onChange={(event, newDate) => {
+            console.log('Help!');
             if (event.type === 'dismissed') {
               toggleShowDateTime(false);
               toggleDateTimeMode('date');
@@ -211,10 +230,13 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
+                setJourneyDateTime(moment(newDate).format('DD-MM-YYYY'));
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
-                setJourneyDateTime(moment(newDate).format('DD-MM-YYYY HH:mm'));
+                const date = journeyDateTime;
+                const time = moment(newDate).format('HH:mm');
+                setJourneyDateTime(`${date} ${time}`);
               }
             }
           }}
