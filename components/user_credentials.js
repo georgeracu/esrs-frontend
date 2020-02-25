@@ -94,7 +94,7 @@ const UserCredentialsScreen = ({navigation}) => {
     };
 
     return (
-        <View style={{flex: 1}}>
+        <View style={styles.root}>
             <ScrollView contentContainerStyle={styles.scrollView}>
                 <Text style={styles.appName}>REPAYLINE</Text>
                 <View style={styles.scrollViewContents}>
@@ -186,6 +186,9 @@ const UserCredentialsScreen = ({navigation}) => {
 export default UserCredentialsScreen;
 
 const styles = StyleSheet.create({
+    root: {
+        ...StyleSheet.absoluteFillObject,
+    },
     appName: {
         fontWeight: 'bold',
         fontSize: 15,
@@ -268,6 +271,8 @@ const styles = StyleSheet.create({
     scrollView: {
         backgroundColor: '#FFFFFF',
         padding: 20,
+        justifyContent: 'space-around',
+        flex: 1,
     },
     scrollViewContents: {
         marginTop: 20,
