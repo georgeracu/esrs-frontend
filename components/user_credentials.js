@@ -68,7 +68,6 @@ const UserCredentialsScreen = ({navigation}) => {
             'postcode': postcode,
         };
 
-        console.log(userCredentials);
         fetch('http://esrs.herokuapp.com/api/auth/user', {
             method: 'POST',
             headers: {

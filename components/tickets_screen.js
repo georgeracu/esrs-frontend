@@ -37,7 +37,6 @@ const TicketsScreen = ({navigation}) => {
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         setJourneys(JSON.parse(persistedJourneys));
-        console.log(JSON.parse(persistedJourneys));
       }
     }
     getPersistedJourneys();
@@ -48,10 +47,7 @@ const TicketsScreen = ({navigation}) => {
   const stationsAndCodesJson = require('../resources/stations_and_codes');
   const stationsAndCodes = new Map();
   stationsAndCodesJson.forEach(stationAndCode => {
-    stationsAndCodes.set(
-      stationAndCode.key.toLowerCase(),
-      stationAndCode.value,
-    );
+    stationsAndCodes.set(stationAndCode.key, stationAndCode.value);
   });
   const stations = Array.from(stationsAndCodes.keys());
   const stationsCodes = Array.from(stationsAndCodes.values());
@@ -65,7 +61,7 @@ const TicketsScreen = ({navigation}) => {
       ? setJourneyFrom(stationName)
       : setJourneyTo(stationName);
     const results = stations.filter(station => {
-      return station.startsWith(stationName.toLowerCase());
+      return station.toLowerCase().startsWith(stationName);
     });
     if (stationName === '') {
       setStationsSuggestions([]);
@@ -77,15 +73,37 @@ const TicketsScreen = ({navigation}) => {
   /**
    * Adds a new journey
    */
-  const addJourney = () => {
+  const addJourney = async () => {
     const journey = {
       id: Math.random().toString(),
       from: journeyFrom,
       to: journeyTo,
       dateTime: `${journeyDate} ${journeyTime}`,
     };
-    journeys.push(journey);
-    AsyncStorage.setItem('journeys', JSON.stringify(journeys));
+    const updatedJourneys = journeys;
+    const id = await AsyncStorage.getItem('id');
+    const response = await fetch(
+      'http://esrs.herokuapp.com/api/auth/user/journey',
+      {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          user_id: id,
+        },
+        body: JSON.stringify({
+          journey_from: journeyFrom,
+          journey_to: journeyTo,
+          journey_datetime: `${journeyDate} ${journeyTime}`,
+        }),
+      },
+    );
+
+    if (response.status === 200) {
+      updatedJourneys.push(journey);
+      setJourneys(updatedJourneys);
+      AsyncStorage.setItem('journeys', JSON.stringify(updatedJourneys));
+    }
   };
 
   return (
@@ -142,14 +160,14 @@ const TicketsScreen = ({navigation}) => {
               value={journeyFrom}
               style={styles.textInputStationLeft}
               placeholder="Departure Station:"
-              onChangeText={text => search(text)}
+              onChangeText={text => search(text.toLowerCase())}
               onFocus={() => toggleJourneyLocation('JF')}
             />
             <TextInput
               value={journeyTo}
               style={styles.textInputStationRight}
               placeholder="Destination Station:"
-              onChangeText={text => search(text)}
+              onChangeText={text => search(text.toLowerCase())}
               onFocus={() => toggleJourneyLocation('JT')}
             />
           </View>
@@ -211,7 +229,7 @@ const TicketsScreen = ({navigation}) => {
                   addJourney();
                   setJourneyFrom('');
                   setJourneyTo('');
-                  setJourneyDate(moment(new Date()).format('DD-MM-YYY'));
+                  setJourneyDate(moment(new Date()).format('DD-MM-YYYY'));
                   setJourneyTime(moment(new Date()).format('HH:mm'));
                   toggleModalVisibility(false);
                 }
@@ -237,7 +255,7 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
-                setJourneyDate(moment(newDate).format('DD-MM-YYY'));
+                setJourneyDate(moment(newDate).format('DD-MM-YYYY'));
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
