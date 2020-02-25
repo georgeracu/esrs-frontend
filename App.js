@@ -15,6 +15,7 @@ import LoginScreen from './components/login_screen.js';
 import RegisterScreen from './components/register_screen.js';
 import ForgotPasswordScreen from './components/forgot_password_screen';
 import TicketsScreen from './components/tickets_screen';
+import TicketDashboard from './components/ticket_dashboard';
 import ClaimsScreen from './components/claims_screen';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Tickets" component={TicketsScreen} />
+        <Stack.Screen name="TicketDashboard" component={TicketDashboard} />
         <Stack.Screen name="Claims" component={ClaimsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Alert,
+  AsyncStorage,
   FlatList,
   Image,
   StyleSheet,
@@ -16,16 +17,32 @@ import moment from 'moment';
 const TicketsScreen = ({navigation}) => {
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
-  const [journeyDateTime, setJourneyDateTime] = useState('Select a date');
+  const [journeyDate, setJourneyDate] = useState(
+    moment(new Date()).format('DD-MM-YYYY'),
+  );
+  const [journeyTime, setJourneyTime] = useState(
+    moment(new Date()).format('HH:mm'),
+  );
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
   const [shouldShowDateTime, toggleShowDateTime] = useState(false);
 
-  const [display, setDisplay] = useState({
-    isModalVisible: false,
-    journeys: [],
-  });
+  const [isModalVisible, toggleModalVisibility] = useState(false);
+
+  const [journeys, setJourneys] = useState([]);
+
+  useEffect(() => {
+    async function getPersistedJourneys() {
+      const persistedJourneys = await AsyncStorage.getItem('journeys');
+      if (persistedJourneys != null) {
+        setJourneys(JSON.parse(persistedJourneys));
+        console.log(JSON.parse(persistedJourneys));
+      }
+    }
+    getPersistedJourneys();
+  }, []);
+
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
   const stationsAndCodesJson = require('../resources/stations_and_codes');
@@ -37,6 +54,7 @@ const TicketsScreen = ({navigation}) => {
     );
   });
   const stations = Array.from(stationsAndCodes.keys());
+  const stationsCodes = Array.from(stationsAndCodes.values());
 
   /**
    * Returns matching stations
@@ -57,14 +75,6 @@ const TicketsScreen = ({navigation}) => {
   };
 
   /**
-   * Toggles the visibility of the modal
-   * @param isVisible
-   */
-  const setModalVisibility = isVisible => {
-    setDisplay({isModalVisible: isVisible, journeys: display.journeys});
-  };
-
-  /**
    * Adds a new journey
    */
   const addJourney = () => {
@@ -72,10 +82,10 @@ const TicketsScreen = ({navigation}) => {
       id: Math.random().toString(),
       from: journeyFrom,
       to: journeyTo,
+      dateTime: `${journeyDate} ${journeyTime}`,
     };
-    const journeys = display.journeys;
     journeys.push(journey);
-    setDisplay({isModalVisible: display.isModalVisible, ...journeys});
+    AsyncStorage.setItem('journeys', JSON.stringify(journeys));
   };
 
   return (
@@ -92,29 +102,39 @@ const TicketsScreen = ({navigation}) => {
         />
       </View>
       <FlatList
-        data={display.journeys}
+        data={journeys}
         keyExtractor={journey => journey.id}
-        renderItem={({item}) => (
-          <View style={styles.journeyView}>
-            <View style={styles.imageTrainLogoContainer}>
-              <Image source={require('../resources/train_placeholder.png')} />
+        renderItem={({item, index}) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('TicketDashboard', {
+                journeyFrom,
+                journeyTo,
+              })
+            }>
+            <View style={styles.journeyView}>
+              <View style={styles.imageTrainLogoContainer}>
+                <Image source={require('../resources/train_placeholder.png')} />
+              </View>
+              <View style={styles.journeyDetails}>
+                <Text>{item.from}</Text>
+                <Image
+                  source={require('../resources/arrow-circle-right.png')}
+                />
+                <Text>{item.to}</Text>
+              </View>
             </View>
-            <View style={styles.journeyDetails}>
-              <Text>{item.from}</Text>
-              <Image source={require('../resources/arrow-circle-right.png')} />
-              <Text>{item.to}</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
-          setModalVisibility(!display.isModalVisible);
+          toggleModalVisibility(!isModalVisible);
         }}>
         <Text style={styles.textPlusSymbol}>+</Text>
       </TouchableOpacity>
-      <Modal isVisible={display.isModalVisible}>
+      <Modal isVisible={isModalVisible}>
         <View style={styles.modal}>
           <View style={styles.textInputContainer}>
             <TextInput
@@ -132,18 +152,6 @@ const TicketsScreen = ({navigation}) => {
               onFocus={() => toggleJourneyLocation('JT')}
             />
           </View>
-          <View style={styles.dateContainer}>
-            <Image
-              style={styles.dateIcon}
-              source={require('../resources/date.png')}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                toggleShowDateTime(true);
-              }}>
-              <Text style={styles.dateText}>{journeyDateTime}</Text>
-            </TouchableOpacity>
-          </View>
           <FlatList
             data={stationsSuggestions}
             keyExtractor={station => station}
@@ -160,6 +168,20 @@ const TicketsScreen = ({navigation}) => {
               </Text>
             )}
           />
+          <View style={styles.dateContainer}>
+            <Image
+              style={styles.dateIcon}
+              source={require('../resources/date.png')}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                toggleShowDateTime(true);
+              }}>
+              <Text style={styles.dateText}>
+                {journeyDate + ' ' + journeyTime}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
@@ -167,7 +189,9 @@ const TicketsScreen = ({navigation}) => {
                 setStationsSuggestions([]);
                 setJourneyFrom('');
                 setJourneyTo('');
-                setModalVisibility(false);
+                setJourneyDate('');
+                setJourneyTime('');
+                toggleModalVisibility(false);
               }}>
               <Text style={styles.textModalButton}>Cancel</Text>
             </TouchableOpacity>
@@ -175,9 +199,8 @@ const TicketsScreen = ({navigation}) => {
               style={styles.modalButtonRight}
               onPress={() => {
                 if (
-                  journeyFrom === '' ||
-                  journeyTo === '' ||
-                  journeyDateTime === 'Select a date'
+                  !stationsCodes.includes(journeyFrom) ||
+                  !stationsCodes.includes(journeyTo)
                 ) {
                   Alert.alert(
                     'Add Journey',
@@ -187,7 +210,9 @@ const TicketsScreen = ({navigation}) => {
                   addJourney();
                   setJourneyFrom('');
                   setJourneyTo('');
-                  setModalVisibility(false);
+                  setJourneyDate(moment(new Date()).format('DD-MM-YYY'));
+                  setJourneyTime(moment(new Date()).format('HH:mm'));
+                  toggleModalVisibility(false);
                 }
               }}>
               <Text style={styles.textModalButton}>Add Journey</Text>
@@ -211,10 +236,11 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
+                setJourneyDate(moment(newDate).format('DD-MM-YYY'));
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
-                setJourneyDateTime(moment(newDate).format('DD-MM-YYYY HH:mm'));
+                setJourneyTime(moment(newDate).format('HH:mm'));
               }
             }
           }}
