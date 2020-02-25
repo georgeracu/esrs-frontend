@@ -8,16 +8,24 @@ const SplashScreen = ({navigation}) => {
   });
 
   const fetchDetails = async () => {
+    const id = await AsyncStorage.getItem('id');
     const email = await AsyncStorage.getItem('email');
     const password = await AsyncStorage.getItem('password');
-    const credential = email + password; // Concatenating empty or null values gives you "" or 0
-    if (credential === '' || credential === 0) {
+    const userCredentials = await AsyncStorage.getItem('user_credentials');
+    if (id === null) {
       navigation.reset({
         index: 0,
         routes: [{name: 'Login'}],
       });
     } else {
-      await authUser(email, password);
+      if (userCredentials === null) {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'UserCredentials'}],
+        });
+      } else {
+        await authUser(email, password);
+      }
     }
   };
 

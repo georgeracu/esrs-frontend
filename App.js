@@ -13,6 +13,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import SplashScreen from './components/splash_screen.js';
 import LoginScreen from './components/login_screen.js';
 import RegisterScreen from './components/register_screen.js';
+import UserCredentialsScreen from './components/user_credentials.js';
 import ForgotPasswordScreen from './components/forgot_password_screen';
 import TicketsScreen from './components/tickets_screen';
 import TicketDashboard from './components/ticket_dashboard';
@@ -27,6 +28,10 @@ function App() {
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen
+          name="UserCredentials"
+          component={UserCredentialsScreen}
+        />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Tickets" component={TicketsScreen} />
         <Stack.Screen name="TicketDashboard" component={TicketDashboard} />

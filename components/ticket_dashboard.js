@@ -15,8 +15,8 @@ import moment from 'moment';
 
 const TicketDashboard = ({route, navigation}) => {
 
-  const {journeyFrom, journeyTo, journeyDateTime}  = route.params;
-  console.log(journeyFrom, journeyTo, journeyDateTime);
+  const {from, to, dateTime}  = route.params;
+  console.log(from, to, dateTime);
 
   return (
     <View style={styles.root}>
