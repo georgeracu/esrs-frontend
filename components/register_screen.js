@@ -29,7 +29,7 @@ const RegisterScreen = ({navigation}) => {
         if (!isEmailCorrect || email === '') {
             Alert.alert('Sing Up', 'Please provide a valid email');
         } else if (password.length < 6) {
-            Alert.alert('Sing Up', 'Password must be above 6 characters');
+            Alert.alert('Sing Up', 'Password must be above 5 characters');
         } else {
             if (!isSigningUp) {
                 signUp(email, password);
