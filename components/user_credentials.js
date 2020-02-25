@@ -89,7 +89,7 @@ const UserCredentialsScreen = ({navigation}) => {
                 Alert.alert('Save Claim Details', 'This is not supposed to happen');
             }
         }).catch(error => {
-
+            // Will be improved in later
             console.log(error);
         });
     };
