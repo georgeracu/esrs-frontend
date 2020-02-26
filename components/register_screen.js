@@ -15,7 +15,6 @@ import {sha256} from 'react-native-sha256';
 
 const RegisterScreen = ({navigation}) => {
 
-    const [id, setId] = useState(''); // Will be updated once the user has been authenticated with firebase
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isEmailCorrect, toggleIsEmailCorrect] = useState(true);
@@ -56,6 +55,8 @@ const RegisterScreen = ({navigation}) => {
                     index: 0,
                     routes: [{name: 'UserCredentials'}],
                 });
+                toggleSignUpBtnTxt('Sign me up');
+                toggleSignUpState(false);
             })
             .catch(error => {
                 toggleSignUpBtnTxt('Sign me up');
@@ -87,6 +88,8 @@ const RegisterScreen = ({navigation}) => {
                         style={[styles.textInputEmail, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575'}]}
                         placeholder="Email"
                         defaultValue={email}
+                        autoCapitalize="none"
+                        textContentType="emailAddress"
                         onChangeText={text => {
                             setEmail(text);
                             if (!validator.isEmail(text)) {

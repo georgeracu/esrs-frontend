@@ -32,8 +32,11 @@ const TicketsScreen = ({navigation}) => {
 
   const [journeys, setJourneys] = useState([]);
 
+  const [id, setId] = useState('');
+
   useEffect(() => {
     async function getPersistedJourneys() {
+      setId(await AsyncStorage.getItem('id'));
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         setJourneys(JSON.parse(persistedJourneys));
@@ -80,8 +83,6 @@ const TicketsScreen = ({navigation}) => {
       to: journeyTo,
       dateTime: `${journeyDate} ${journeyTime}`,
     };
-    const updatedJourneys = journeys;
-    const id = await AsyncStorage.getItem('id');
     const response = await fetch(
       'http://esrs.herokuapp.com/api/auth/user/journey',
       {
@@ -100,9 +101,8 @@ const TicketsScreen = ({navigation}) => {
     );
 
     if (response.status === 200) {
-      updatedJourneys.push(journey);
-      setJourneys(updatedJourneys);
-      AsyncStorage.setItem('journeys', JSON.stringify(updatedJourneys));
+      setJourneys([...journeys, journey]);
+      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
     }
   };
 
@@ -175,16 +175,15 @@ const TicketsScreen = ({navigation}) => {
             data={stationsSuggestions}
             keyExtractor={station => station}
             renderItem={({item}) => (
-              <Text
-                style={styles.listItem}
+              <TouchableOpacity
                 onPress={() => {
                   journeyLocation === 'JF'
                     ? setJourneyFrom(stationsAndCodes.get(item))
                     : setJourneyTo(stationsAndCodes.get(item));
                   setStationsSuggestions([]);
                 }}>
-                {item}
-              </Text>
+                <Text style={styles.listItem}>{item}</Text>
+              </TouchableOpacity>
             )}
           />
           <View style={styles.dateContainer}>
@@ -208,8 +207,8 @@ const TicketsScreen = ({navigation}) => {
                 setStationsSuggestions([]);
                 setJourneyFrom('');
                 setJourneyTo('');
-                setJourneyDate('');
-                setJourneyTime('');
+                setJourneyDate(moment(new Date()).format('DD-MM-YYYY'));
+                setJourneyTime(moment(new Date()).format('HH:mm'));
                 toggleModalVisibility(false);
               }}>
               <Text style={styles.textModalButton}>Cancel</Text>

@@ -11,14 +11,14 @@ const SplashScreen = ({navigation}) => {
     const id = await AsyncStorage.getItem('id');
     const email = await AsyncStorage.getItem('email');
     const password = await AsyncStorage.getItem('password');
-    const userCredentials = await AsyncStorage.getItem('user_credentials');
+    const isSignUpComplete = await AsyncStorage.getItem('isSignUpComplete');
     if (id === null) {
       navigation.reset({
         index: 0,
         routes: [{name: 'Login'}],
       });
     } else {
-      if (userCredentials === null) {
+      if (isSignUpComplete === 'false') {
         navigation.reset({
           index: 0,
           routes: [{name: 'UserCredentials'}],

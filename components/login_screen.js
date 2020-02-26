@@ -42,38 +42,68 @@ const LoginScreen = ({navigation}) => {
         toggleLogInBtnTxt('Logging In');
         toggleLoginState(true);
         const hash = await sha256(password);
-        auth()
-            .signInWithEmailAndPassword(email, hash)
-            .then(async (credentials) => {
+        try {
+            const credentials = await auth().signInWithEmailAndPassword(email, hash);
+            const response = await fetch('http://esrs.herokuapp.com/api/auth/user', {
+                headers: {
+                    method: 'GET',
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    user_id: credentials.user.uid,
+                }
+            });
+            if (response.status === 200) {
                 // Persist user's credentials
                 await AsyncStorage.setItem('id', credentials.user.uid);
                 await AsyncStorage.setItem('email', email);
                 await AsyncStorage.setItem('password', hash);
+                await AsyncStorage.setItem('isSignUpComplete', 'true');
+                const user = await response.json();
+                const modifiedJourneys = user.journeys.map(parsedJourney => ({
+                    id: Math.random().toString(),
+                    from: parsedJourney.journey_from,
+                    to: parsedJourney.journey_to,
+                    dateTime: parsedJourney.journey_datetime,
+                }));
+                await AsyncStorage.setItem('journeys', JSON.stringify(modifiedJourneys));
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],
                 });
-            })
-            .catch(error => {
+            } else {
                 toggleLogInBtnTxt('Log me in');
                 toggleLoginState(false);
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        Alert.alert(
-                            'Sign In',
-                            "Sorry, you don't have an account, please sign up for one",
-                        );
-                        break;
-                    case 'auth/invalid-email':
-                        Alert.alert('Sign In', `Hey, ${email} is invalid`);
-                        break;
-                    case 'auth/wrong-password':
-                        Alert.alert('Sign In', 'Hey, looks like your password is wrong');
-                        break;
-                    default:
-                    // Do nothing
-                }
-            });
+            }
+        } catch (error) {
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    Alert.alert(
+                        'Sign In',
+                        "Sorry, you don't have an account, please sign up for one",
+                    );
+                    break;
+                case 'auth/invalid-email':
+                    Alert.alert('Sign In', `Hey, ${email} is invalid`);
+                    break;
+                case 'auth/wrong-password':
+                    Alert.alert('Sign In', 'Hey, looks like your password is wrong');
+                    break;
+                default:
+                // Do nothing
+            }
+        }
+
+        //.then(async (credentials) => {
+
+
+        // })
+        // .catch(error => {
+        //     toggleLogInBtnTxt('Log me in');
+        //     toggleLoginState(false);
+        //
+        // });
+        toggleLogInBtnTxt('Log me in');
+        toggleLoginState(false);
     };
 
     return (
@@ -90,6 +120,8 @@ const LoginScreen = ({navigation}) => {
                         style={[styles.textInputEmail, {borderColor: isEmailCorrect ? '#CCCCCC' : '#DC7575'}]}
                         placeholder="Email"
                         defaultValue={email}
+                        autoCapitalize="none"
+                        textContentType="emailAddress"
                         onChangeText={text => {
                             setEmail(text);
                             if (!validator.isEmail(text)) {
