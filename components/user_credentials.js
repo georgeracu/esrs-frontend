@@ -77,7 +77,7 @@ const UserCredentialsScreen = ({navigation}) => {
             body: JSON.stringify(userCredentials),
         }).then(async response => {
             if (response.status === 200) {
-                await AsyncStorage.setItem('user_credentials', JSON.stringify(userCredentials));
+                await AsyncStorage.setItem('isSignUpComplete', 'true');
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],
@@ -159,6 +159,7 @@ const UserCredentialsScreen = ({navigation}) => {
                             style={styles.text_input_town_city_postcode}
                             placeholder="Postcode"
                             textContentType="postalCode"
+                            autoCapitalize="characters"
                             onChangeText={text => setPostcode(text)}
                         />
                     </View>
