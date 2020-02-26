@@ -50,7 +50,7 @@ const LoginScreen = ({navigation}) => {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     user_id: credentials.user.uid,
-                }
+                },
             });
             if (response.status === 200) {
                 // Persist user's credentials
@@ -92,18 +92,6 @@ const LoginScreen = ({navigation}) => {
                 // Do nothing
             }
         }
-
-        //.then(async (credentials) => {
-
-
-        // })
-        // .catch(error => {
-        //     toggleLogInBtnTxt('Log me in');
-        //     toggleLoginState(false);
-        //
-        // });
-        toggleLogInBtnTxt('Log me in');
-        toggleLoginState(false);
     };
 
     return (
