@@ -14,12 +14,56 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 
 const TicketDashboard = ({route, navigation}) => {
-
-  const {from, to, dateTime}  = route.params;
+  const {from, to, dateTime} = route.params;
   console.log(from, to, dateTime);
 
   return (
     <View style={styles.root}>
+      <View style={styles.topView}>
+        <Text style={styles.welcomeMessageFirstLine}>Manage your</Text>
+        <Text style={styles.welcomeMessage}>Ticket</Text>
+      </View>
+      <View style={styles.temp}>
+        <Text>Ticket: 12345dfsdgw4etryhgfd</Text>
+      </View>
+      <View style={styles.ticketDetailsContainer}>
+        <View style={styles.ticketDetailView}>
+          <Image
+            style={styles.dateIcon}
+            source={require('../resources/date.png')}
+          />
+          <View style={styles.ticketDetailTextContainer}>
+            <Text style={styles.ticketDetailLabelText}>From</Text>
+            <Text style={styles.ticketDetailText}>{from}</Text>
+          </View>
+        </View>
+        <View style={styles.ticketDetailView}>
+          <Image
+            style={styles.dateIcon}
+            source={require('../resources/date.png')}
+          />
+          <View style={styles.ticketDetailTextContainer}>
+            <Text style={styles.ticketDetailLabelText}>To</Text>
+            <Text style={styles.ticketDetailText}>{to}</Text>
+          </View>
+        </View>
+        <View style={styles.ticketDetailView}>
+          <Image
+            style={styles.dateIcon}
+            source={require('../resources/date.png')}
+          />
+          <View style={styles.ticketDetailTextContainer}>
+            <Text style={styles.ticketDetailLabelText}>Date</Text>
+            <Text style={styles.ticketDetailText}>{dateTime}</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.ticketButtonsContainer}>
+        <Text></Text>
+        <View style={styles.claimSubmissionBtn}>
+          <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -28,164 +72,75 @@ export default TicketDashboard;
 
 const styles = StyleSheet.create({
   root: {
-    padding: 20,
-    backgroundColor: 'rgba(104, 126, 252, 0.1)',
-    ...StyleSheet.absoluteFillObject,
-  },
-  viewSeeTravels: {
-    marginBottom: 10,
-  },
-  textSeeTravels: {
-    fontWeight: 'bold',
-    fontSize: 30,
-    color: '#190320',
-    fontFamily: 'sans-serif-thin',
-  },
-  ticketsSearchIconContainer: {
-    height: 60,
-    marginTop: 10,
-  },
-  ticketsSearchIcon: {
-    position: 'absolute',
-    right: 20,
-    top: 20,
-  },
-  textInputTicketsSearch: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 20,
-    fontFamily: 'sans-serif-light',
-  },
-  fab: {
-    height: 60,
-    width: 60,
-    borderRadius: 200,
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#687DFC',
-  },
-  textPlusSymbol: {
-    fontSize: 30,
-    color: '#FFFFFF',
-  },
-  modal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-  },
-  textInputContainer: {
-    flexDirection: 'row',
-    borderBottomColor: '#CCCCCC',
-    borderBottomWidth: 1,
-    fontFamily: 'sans-serif-light',
-  },
-  textInputStationLeft: {
-    height: 60,
-    padding: 20,
-    flexBasis: 1,
-    flexGrow: 1,
-    borderRightColor: '#CCCCCC',
-    borderRightWidth: 1,
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 8,
-  },
-  textInputStationRight: {
-    height: 60,
-    padding: 20,
-    flexBasis: 1,
-    flexGrow: 1,
-    backgroundColor: '#FFFFFF',
-    borderTopRightRadius: 8,
-  },
-  selectDate: {
-    fontFamily: 'sans-serif-thin',
-    fontSize: 15,
-    color: '#FFFFFF',
-  },
-  modalButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  modalButtonLeft: {
-    color: '#FFFFFF',
-    backgroundColor: '#3c3c3d',
-    flexBasis: 1,
-    flexGrow: 1,
-    padding: 20,
-    fontFamily: 'sans-serif-medium',
-    fontSize: 15,
-    borderBottomLeftRadius: 8,
-  },
-  modalButtonRight: {
-    color: '#FFFFFF',
-    backgroundColor: '#687DFC',
-    flexBasis: 1,
-    flexGrow: 1,
-    padding: 20,
-    fontFamily: 'sans-serif-medium',
-    fontSize: 15,
-    borderBottomRightRadius: 8,
-  },
-  journeyView: {
-    flexDirection: 'row',
-    marginTop: 10,
-    height: 80,
-  },
-  imageTrainLogoContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6,
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    padding: 10,
-    margin: 1,
-    width: 60,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  journeyDetails: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    borderTopRightRadius: 6,
-    borderBottomRightRadius: 6,
-    padding: 10,
-    margin: 1,
     flex: 1,
-    color: '#000000',
-    flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center',
-    alignContent: 'center',
   },
-  listItem: {
-    marginTop: 10,
-    marginBottom: 10,
+  topView: {
+    backgroundColor: '#687DFC',
+    padding: 20,
+    flexGrow: 1,
+  },
+  temp: {
+    backgroundColor: '#373759',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    flexGrow: 1,
+    top: -25,
+    padding: 30,
+  },
+  welcomeMessageFirstLine: {
+    fontFamily: 'sans-serif',
+    color: '#FFFFFF',
+    fontSize: 35,
+  },
+  welcomeMessage: {
+    fontSize: 35,
+    color: '#FFFFFF',
+    fontFamily: 'sans-serif',
+  },
+  ticketDetailsContainer: {
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: '#000000',
+    padding: 20,
+    flexGrow: 1,
+  },
+  ticketDetailView: {
     marginLeft: 20,
     marginRight: 20,
-    color: '#000000',
+    marginTop: 10,
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 15,
+    flexDirection: 'row',
   },
-  textModalButton: {
+  ticketDetailLabelText: {
+    color: '#445587',
+    fontFamily: 'sans-serif-thin',
+  },
+  ticketDetailText: {
+    color: '#242133',
+    fontFamily: 'sans-serif',
+  },
+  ticketDetailTextContainer: {
+    marginLeft: 20,
+  },
+  ticketButtonsContainer: {
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    backgroundColor: '#FFFFFF',
+    flexGrow: 1,
+    padding: 30,
+  },
+  claimSubmissionBtn: {
+    backgroundColor: '#5C5FC9',
+    borderRadius: 15,
+    padding: 30,
+    width: 150,
+    position: 'relative',
+  },
+  claimSubmissionBtnTxt: {
     color: '#FFFFFF',
     textAlign: 'center',
-    fontFamily: 'sans-serif-medium',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 15,
-  },
-  dateIcon: {
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  dateText: {
-    fontFamily: 'sans-serif-thin',
   },
 });
