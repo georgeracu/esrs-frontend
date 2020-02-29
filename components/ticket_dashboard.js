@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -12,16 +12,26 @@ import {
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import messaging from '@react-native-firebase/messaging';
 
 const TicketDashboard = ({route, navigation}) => {
+  const {from, to, dateTime} = route.params;
 
-  const {from, to, dateTime}  = route.params;
-  console.log(from, to, dateTime);
+  useEffect(() => {
+    async function doStuff() {
+      const enabled = await messaging().hasPermission();
+      console.log(enabled);
+      const fcmToken = await messaging().getToken();
+      console.log(fcmToken);
+    }
+    doStuff();
 
-  return (
-    <View style={styles.root}>
-    </View>
-  );
+    const unsubscribe = messaging().onMessage(remoteMessage => {
+      console.log('FCM Message Data:', JSON.stringify(remoteMessage));
+    });
+  }, []);
+
+  return <View style={styles.root} />;
 };
 
 export default TicketDashboard;
