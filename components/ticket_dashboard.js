@@ -22,12 +22,18 @@ const TicketDashboard = ({route, navigation}) => {
     <View style={styles.root}>
       <ImageBackground
         source={require('../resources/wallpaper.png')}
-        style={styles.topView}>
-        {/*<Text style={styles.welcomeMessageFirstLine}>Manage your</Text>*/}
-        {/*<Text style={styles.welcomeMessage}>Ticket</Text>*/}
-      </ImageBackground>
-      <View style={styles.temp}>
-        <Text style={styles.darkContainerTxt}>Ticket: 12345dfsdgw4etryhgfd</Text>
+        style={styles.topView}
+      />
+      <View style={styles.darkContainer}>
+        <View style={styles.darkContainerContents}>
+          <Text style={styles.darkContainerTxt}>
+            Ticket: 12345dfsdgw4etryhgfd
+          </Text>
+          <Image
+            style={styles.dateIcon}
+            source={require('../resources/ticket.png')}
+          />
+        </View>
       </View>
       <View style={styles.ticketDetailsContainer}>
         <View style={styles.ticketDetailView}>
@@ -62,10 +68,11 @@ const TicketDashboard = ({route, navigation}) => {
         </View>
       </View>
       <View style={styles.ticketButtonsContainer}>
-        <Text />
-        <View style={styles.claimSubmissionBtn}>
-          <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
-        </View>
+        <TouchableOpacity>
+          <View style={styles.claimSubmissionBtn}>
+            <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -82,25 +89,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#687DFC',
     padding: 20,
     flexGrow: 3,
-
   },
-  temp: {
+  darkContainer: {
     backgroundColor: '#373759',
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
     flexGrow: 1,
-    padding: 30,
     marginTop: -30,
   },
-  welcomeMessageFirstLine: {
-    fontFamily: 'sans-serif',
-    color: '#FFFFFF',
-    fontSize: 35,
+  darkContainerContents: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 30,
   },
-  welcomeMessage: {
-    fontSize: 35,
+  darkContainerTxt: {
     color: '#FFFFFF',
-    fontFamily: 'sans-serif',
+    fontSize: 18,
   },
   ticketDetailsContainer: {
     borderTopLeftRadius: 35,
@@ -149,9 +153,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     fontFamily: 'sans-serif-medium',
-  },
-  darkContainerTxt: {
-    color: '#FFFFFF',
-    fontSize: 20,
   },
 });
