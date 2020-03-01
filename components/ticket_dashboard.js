@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   Image,
+  ImageBackground,
   StyleSheet,
   Text,
   TextInput,
@@ -19,18 +20,20 @@ const TicketDashboard = ({route, navigation}) => {
 
   return (
     <View style={styles.root}>
-      <View style={styles.topView}>
-        <Text style={styles.welcomeMessageFirstLine}>Manage your</Text>
-        <Text style={styles.welcomeMessage}>Ticket</Text>
-      </View>
+      <ImageBackground
+        source={require('../resources/wallpaper.png')}
+        style={styles.topView}>
+        {/*<Text style={styles.welcomeMessageFirstLine}>Manage your</Text>*/}
+        {/*<Text style={styles.welcomeMessage}>Ticket</Text>*/}
+      </ImageBackground>
       <View style={styles.temp}>
-        <Text>Ticket: 12345dfsdgw4etryhgfd</Text>
+        <Text style={styles.darkContainerTxt}>Ticket: 12345dfsdgw4etryhgfd</Text>
       </View>
       <View style={styles.ticketDetailsContainer}>
         <View style={styles.ticketDetailView}>
           <Image
             style={styles.dateIcon}
-            source={require('../resources/date.png')}
+            source={require('../resources/arrow.png')}
           />
           <View style={styles.ticketDetailTextContainer}>
             <Text style={styles.ticketDetailLabelText}>From</Text>
@@ -40,7 +43,7 @@ const TicketDashboard = ({route, navigation}) => {
         <View style={styles.ticketDetailView}>
           <Image
             style={styles.dateIcon}
-            source={require('../resources/date.png')}
+            source={require('../resources/map_pin.png')}
           />
           <View style={styles.ticketDetailTextContainer}>
             <Text style={styles.ticketDetailLabelText}>To</Text>
@@ -50,7 +53,7 @@ const TicketDashboard = ({route, navigation}) => {
         <View style={styles.ticketDetailView}>
           <Image
             style={styles.dateIcon}
-            source={require('../resources/date.png')}
+            source={require('../resources/tiny_date.png')}
           />
           <View style={styles.ticketDetailTextContainer}>
             <Text style={styles.ticketDetailLabelText}>Date</Text>
@@ -59,7 +62,7 @@ const TicketDashboard = ({route, navigation}) => {
         </View>
       </View>
       <View style={styles.ticketButtonsContainer}>
-        <Text></Text>
+        <Text />
         <View style={styles.claimSubmissionBtn}>
           <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
         </View>
@@ -78,15 +81,16 @@ const styles = StyleSheet.create({
   topView: {
     backgroundColor: '#687DFC',
     padding: 20,
-    flexGrow: 1,
+    flexGrow: 3,
+
   },
   temp: {
     backgroundColor: '#373759',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
     flexGrow: 1,
-    top: -25,
     padding: 30,
+    marginTop: -30,
   },
   welcomeMessageFirstLine: {
     fontFamily: 'sans-serif',
@@ -99,10 +103,11 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
   },
   ticketDetailsContainer: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    backgroundColor: '#000000',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    backgroundColor: '#DCDCF0',
     padding: 20,
+    marginTop: -30,
     flexGrow: 1,
   },
   ticketDetailView: {
@@ -126,21 +131,27 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   ticketButtonsContainer: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
     backgroundColor: '#FFFFFF',
-    flexGrow: 1,
     padding: 30,
+    marginTop: -30,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   claimSubmissionBtn: {
     backgroundColor: '#5C5FC9',
     borderRadius: 15,
-    padding: 30,
+    padding: 20,
     width: 150,
-    position: 'relative',
   },
   claimSubmissionBtnTxt: {
     color: '#FFFFFF',
     textAlign: 'center',
+    fontFamily: 'sans-serif-medium',
+  },
+  darkContainerTxt: {
+    color: '#FFFFFF',
+    fontSize: 20,
   },
 });
