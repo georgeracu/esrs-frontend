@@ -75,6 +75,8 @@ const LoginScreen = ({navigation}) => {
                 toggleLoginState(false);
             }
         } catch (error) {
+            toggleLogInBtnTxt('Log me in');
+            toggleLoginState(false);
             switch (error.code) {
                 case 'auth/user-not-found':
                     Alert.alert(
