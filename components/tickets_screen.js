@@ -126,9 +126,9 @@ const TicketsScreen = ({navigation}) => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('TicketDashboard', {
-                from: journeyFrom,
-                to: journeyTo,
-                dateTime: journeyDate + ' ' + journeyTime,
+                from: journeys[index].from,
+                to: journeys[index].to,
+                dateTime: journeys[index].dateTime,
               })
             }>
             <View style={styles.journeyView}>
