@@ -76,16 +76,15 @@ const UserCredentialsScreen = ({navigation}) => {
             },
             body: JSON.stringify(userCredentials),
         }).then(async response => {
-            if (response.status === 200) {
+            if (response.status === 201) {
                 await AsyncStorage.setItem('isSignUpComplete', 'true');
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],
                 });
-            } else if (response.status === 400) {
+            } else {
                 toggleSaveDetailsBtnTxt('Save my claim details');
                 toggleSavingDetailsState(false);
-                Alert.alert('Save Claim Details', 'This is not supposed to happen');
             }
         }).catch(error => {
             // Will be improved in later
