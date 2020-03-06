@@ -7,7 +7,8 @@
  */
 
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, {useEffect} from 'react';
+import {Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import SplashScreen from './components/splash_screen.js';
@@ -18,8 +19,26 @@ import ForgotPasswordScreen from './components/forgot_password_screen';
 import TicketsScreen from './components/tickets_screen';
 import TicketDashboard from './components/ticket_dashboard';
 import ClaimsScreen from './components/claims_screen';
+import messaging from '@react-native-firebase/messaging';
 
 function App() {
+  useEffect(() => {
+    async function setupFCM() {
+      const hasPermission = await messaging().hasPermission();
+      if (!hasPermission) {
+        await messaging().requestPermission();
+      } else {
+        const fcmToken = await messaging().getToken();
+        console.log(fcmToken);
+
+        messaging().onMessage((message: RemoteMessage) => {
+          console.log(message.data.msg);
+        });
+      }
+    }
+    setupFCM();
+  }, []);
+
   const Stack = createStackNavigator();
 
   return (
