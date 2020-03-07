@@ -13,11 +13,12 @@ import {
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
-  const [journeyDate, setJourneyDate] = useState(
+  const [journeyDay, setJourneyDate] = useState(
     moment(new Date()).format('DD-MM-YYYY'),
   );
   const [journeyTime, setJourneyTime] = useState(
@@ -77,11 +78,13 @@ const TicketsScreen = ({navigation}) => {
    * Adds a new journey
    */
   const addJourney = async () => {
+    const journeyDetails = `${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`;
+    const hash = await sha256(journeyDetails);
     const journey = {
-      id: Math.random().toString(),
-      from: journeyFrom,
-      to: journeyTo,
-      dateTime: `${journeyDate} ${journeyTime}`,
+      journey_id: hash,
+      journey_from: journeyFrom,
+      journey_to: journeyTo,
+      journey_datetime: `${journeyDay} ${journeyTime}`,
     };
     const response = await fetch(
       'http://esrs.herokuapp.com/api/auth/user/journey',
@@ -92,11 +95,7 @@ const TicketsScreen = ({navigation}) => {
           'Content-Type': 'application/json',
           user_id: id,
         },
-        body: JSON.stringify({
-          journey_from: journeyFrom,
-          journey_to: journeyTo,
-          journey_datetime: `${journeyDate} ${journeyTime}`,
-        }),
+        body: JSON.stringify(journey),
       },
     );
 
@@ -196,7 +195,7 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(true);
               }}>
               <Text style={styles.dateText}>
-                {journeyDate + ' ' + journeyTime}
+                {journeyDay + ' ' + journeyTime}
               </Text>
             </TouchableOpacity>
           </View>

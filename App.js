@@ -8,6 +8,7 @@
 
 import 'react-native-gesture-handler';
 import React, {useEffect} from 'react';
+import {AsyncStorage} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import SplashScreen from './components/splash_screen.js';
@@ -28,7 +29,7 @@ function App() {
         await messaging().requestPermission();
       } else {
         const fcmToken = await messaging().getToken();
-        console.log(fcmToken);
+        await AsyncStorage.setItem('fcm_token', fcmToken);
 
         messaging().onMessage((message: RemoteMessage) => {
           console.log(message.data.msg);
