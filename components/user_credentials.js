@@ -55,8 +55,10 @@ const UserCredentialsScreen = ({navigation}) => {
 
         const id = await AsyncStorage.getItem('id');
         const email = await AsyncStorage.getItem('email');
+        const fcmToken = await AsyncStorage.getItem('fcm_token');
         const userCredentials = {
             'user_id': id,
+            'fcm_token': fcmToken,
             'email': email,
             'title': title,
             'first_name': firstName,
@@ -78,6 +80,7 @@ const UserCredentialsScreen = ({navigation}) => {
         }).then(async response => {
             if (response.status === 201) {
                 await AsyncStorage.setItem('isSignUpComplete', 'true');
+                await AsyncStorage.removeItem('fcm_token');
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],

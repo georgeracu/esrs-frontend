@@ -59,13 +59,7 @@ const LoginScreen = ({navigation}) => {
                 await AsyncStorage.setItem('password', hash);
                 await AsyncStorage.setItem('isSignUpComplete', 'true');
                 const user = await response.json();
-                const modifiedJourneys = user.journeys.map(parsedJourney => ({
-                    id: Math.random().toString(),
-                    from: parsedJourney.journey_from,
-                    to: parsedJourney.journey_to,
-                    dateTime: parsedJourney.journey_datetime,
-                }));
-                await AsyncStorage.setItem('journeys', JSON.stringify(modifiedJourneys));
+                await AsyncStorage.setItem('journeys', JSON.stringify(user.journeys));
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],
