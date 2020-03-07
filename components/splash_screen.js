@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {AsyncStorage, StyleSheet, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const SplashScreen = ({navigation}) => {
   useEffect(() => {
@@ -13,6 +14,8 @@ const SplashScreen = ({navigation}) => {
     const password = await AsyncStorage.getItem('password');
     const isSignUpComplete = await AsyncStorage.getItem('isSignUpComplete');
     if (id === null) {
+      const fcmToken = await messaging().getToken();
+      await AsyncStorage.setItem('fcm_token', fcmToken);
       navigation.reset({
         index: 0,
         routes: [{name: 'Login'}],

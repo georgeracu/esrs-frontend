@@ -28,9 +28,6 @@ function App() {
       if (!hasPermission) {
         await messaging().requestPermission();
       } else {
-        const fcmToken = await messaging().getToken();
-        await AsyncStorage.setItem('fcm_token', fcmToken);
-
         messaging().onMessage((message: RemoteMessage) => {
           console.log(message.data.msg);
         });
