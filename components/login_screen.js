@@ -12,6 +12,7 @@ import {
 import validator from 'validator';
 import auth from '@react-native-firebase/auth';
 import {sha256} from 'react-native-sha256';
+import generateFCMToken from '../utils/fcm';
 
 const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState('');
@@ -53,6 +54,7 @@ const LoginScreen = ({navigation}) => {
                 },
             });
             if (response.status === 200) {
+                await generateFCMToken(credentials.user.uid);
                 // Persist user's credentials
                 await AsyncStorage.setItem('id', credentials.user.uid);
                 await AsyncStorage.setItem('email', email);
@@ -64,9 +66,11 @@ const LoginScreen = ({navigation}) => {
                     index: 0,
                     routes: [{name: 'Tickets'}],
                 });
-            } else {
-                toggleLogInBtnTxt('Log me in');
-                toggleLoginState(false);
+            } else if (response.status === 401) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'UserCredentials'}],
+                });
             }
         } catch (error) {
             toggleLogInBtnTxt('Log me in');

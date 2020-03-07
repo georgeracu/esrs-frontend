@@ -50,7 +50,6 @@ const RegisterScreen = ({navigation}) => {
                 await AsyncStorage.setItem('id', credentials.user.uid);
                 await AsyncStorage.setItem('email', email);
                 await AsyncStorage.setItem('password', hash);
-                // Make POST request to backend
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'UserCredentials'}],
@@ -59,6 +58,7 @@ const RegisterScreen = ({navigation}) => {
                 toggleSignUpState(false);
             })
             .catch(error => {
+                console.log(error);
                 toggleSignUpBtnTxt('Sign me up');
                 toggleSignUpState(false);
                 switch (error.code) {
