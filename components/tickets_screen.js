@@ -120,14 +120,15 @@ const TicketsScreen = ({navigation}) => {
       </View>
       <FlatList
         data={journeys}
-        keyExtractor={journey => journey.id}
+        keyExtractor={journey => journey.journey_id}
         renderItem={({item, index}) => (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('TicketDashboard', {
-                from: journeys[index].from,
-                to: journeys[index].to,
-                dateTime: journeys[index].dateTime,
+                id: journeys[index].journey_id,
+                from: journeys[index].journey_from,
+                to: journeys[index].journey_to,
+                dateTime: journeys[index].journey_datetime,
               })
             }>
             <View style={styles.journeyView}>
@@ -135,11 +136,11 @@ const TicketsScreen = ({navigation}) => {
                 <Image source={require('../resources/train_placeholder.png')} />
               </View>
               <View style={styles.journeyDetails}>
-                <Text>{item.from}</Text>
+                <Text>{item.journey_from}</Text>
                 <Image
                   source={require('../resources/arrow-circle-right.png')}
                 />
-                <Text>{item.to}</Text>
+                <Text>{item.journey_to}</Text>
               </View>
             </View>
           </TouchableOpacity>

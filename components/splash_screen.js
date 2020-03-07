@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {AsyncStorage, StyleSheet, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import messaging from '@react-native-firebase/messaging';
 
 const SplashScreen = ({navigation}) => {
   useEffect(() => {
@@ -9,27 +8,9 @@ const SplashScreen = ({navigation}) => {
   });
 
   const fetchDetails = async () => {
-    const id = await AsyncStorage.getItem('id');
     const email = await AsyncStorage.getItem('email');
     const password = await AsyncStorage.getItem('password');
-    const isSignUpComplete = await AsyncStorage.getItem('isSignUpComplete');
-    if (id === null) {
-      const fcmToken = await messaging().getToken();
-      await AsyncStorage.setItem('fcm_token', fcmToken);
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Login'}],
-      });
-    } else {
-      if (isSignUpComplete === 'false') {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'UserCredentials'}],
-        });
-      } else {
-        await authUser(email, password);
-      }
-    }
+    await authUser(email, password);
   };
 
   /**
@@ -38,21 +19,37 @@ const SplashScreen = ({navigation}) => {
    * @param {*} password of the user
    */
   const authUser = async (email, password) => {
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Tickets'}],
-        });
-      })
-      .catch(err => {
-        console.log(err);
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Login'}],
-        });
+    if (email === null || password === null) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
       });
+    } else {
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(async () => {
+          const isSignUpComplete = await AsyncStorage.getItem(
+            'isSignUpComplete',
+          );
+          if (isSignUpComplete) {
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Tickets'}],
+            });
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'UserCredentials'}],
+            });
+          }
+        })
+        .catch(err => {
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Login'}],
+          });
+        });
+    }
   };
 
   return (
