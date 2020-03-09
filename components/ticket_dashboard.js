@@ -21,9 +21,7 @@ const TicketDashboard = ({route, navigation}) => {
   useEffect(() => {
     async function doStuff() {
       const enabled = await messaging().hasPermission();
-      console.log(enabled);
       const fcmToken = await messaging().getToken();
-      console.log(fcmToken);
     }
     doStuff();
     const unsubscribe = messaging().onMessage(remoteMessage => {

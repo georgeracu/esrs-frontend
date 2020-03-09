@@ -12,7 +12,7 @@ import {
     View,
 } from 'react-native';
 import validator from 'validator';
-import generateFCMToken from "../utils/fcm";
+import generateFCMToken from '../utils/fcm';
 
 const UserCredentialsScreen = ({navigation}) => {
 
@@ -84,11 +84,23 @@ const UserCredentialsScreen = ({navigation}) => {
                     index: 0,
                     routes: [{name: 'Tickets'}],
                 });
+            } if (response.status === 400) {
+                Alert.alert('Save Details', 'Hey, looks like you already have an account with us', [
+                    {
+                        text: 'Login',
+                        onPress: () => {
+                            navigation.reset({
+                                index: 0,
+                                routes: [{name: 'Login'}],
+                            });
+                        },
+                    },
+                ]);
             } else {
                 toggleSaveDetailsBtnTxt('Save my claim details');
                 toggleSavingDetailsState(false);
             }
-        }).catch(error => {
+        }).catch( error => {
             // Will be improved in later
             console.log(error);
         });

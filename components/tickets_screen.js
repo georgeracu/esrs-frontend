@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   Alert,
   AsyncStorage,
@@ -16,6 +16,8 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
+  const selectedJourney = useRef(null);
+
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDate] = useState(
@@ -130,7 +132,14 @@ const TicketsScreen = ({navigation}) => {
                 to: journeys[index].journey_to,
                 dateTime: journeys[index].journey_datetime,
               })
-            }>
+            }
+            ref={selectedJourney}
+            onLongPress={() => {
+              console.log(selectedJourney.current);
+              selectedJourney.current.setNativeProps({
+                opacity: 0.2,
+              });
+            }}>
             <View style={styles.journeyView}>
               <View style={styles.imageTrainLogoContainer}>
                 <Image source={require('../resources/train_placeholder.png')} />
