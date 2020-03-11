@@ -16,8 +16,6 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
-  const selectedJourney = useRef(null);
-
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDate] = useState(
@@ -114,9 +112,8 @@ const TicketsScreen = ({navigation}) => {
   };
 
   /**
-   *
+   * Selects a journey item
    * @param item
-   * @param index
    */
   const selectJourney = item => {
     item.isSelected = !item.isSelected;
@@ -128,7 +125,6 @@ const TicketsScreen = ({navigation}) => {
     );
     journeys[index] = item;
     setJourneys([...journeys]);
-    console.log(item);
   };
 
   return (
@@ -150,15 +146,21 @@ const TicketsScreen = ({navigation}) => {
         keyExtractor={journey => journey.journey_id}
         renderItem={({item, index}) => (
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('TicketDashboard', {
-                id: journeys[index].journey_id,
-                from: journeys[index].journey_from,
-                to: journeys[index].journey_to,
-                dateTime: journeys[index].journey_datetime,
-              })
-            }
-            ref={selectedJourney}
+            onPress={() => {
+              const selectedJourneys = journeys.filter(
+                journey => journey.isSelected,
+              );
+              if (selectedJourneys.length > 0) {
+                selectJourney(item);
+              } else {
+                navigation.navigate('TicketDashboard', {
+                  id: journeys[index].journey_id,
+                  from: journeys[index].journey_from,
+                  to: journeys[index].journey_to,
+                  dateTime: journeys[index].journey_datetime,
+                });
+              }
+            }}
             onLongPress={() => {
               selectJourney(item);
             }}>
