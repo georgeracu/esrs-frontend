@@ -42,7 +42,13 @@ const TicketsScreen = ({navigation}) => {
       setId(await AsyncStorage.getItem('id'));
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
-        setJourneys(JSON.parse(persistedJourneys));
+        const parsedJourneysJson = JSON.parse(persistedJourneys);
+        const modifiedJourneys = parsedJourneysJson.map(journey => {
+          journey.isSelected = false;
+          journey.style = styles.journeyView;
+          return journey;
+        });
+        setJourneys(modifiedJourneys);
       }
     }
     getPersistedJourneys();
@@ -107,6 +113,24 @@ const TicketsScreen = ({navigation}) => {
     }
   };
 
+  /**
+   *
+   * @param item
+   * @param index
+   */
+  const selectJourney = item => {
+    item.isSelected = !item.isSelected;
+    item.style = item.isSelected
+      ? styles.journeyViewSelected
+      : styles.journeyView;
+    const index = journeys.findIndex(
+      value => value.journey_id === item.journey_id,
+    );
+    journeys[index] = item;
+    setJourneys([...journeys]);
+    console.log(item);
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.viewSeeTravels}>
@@ -122,6 +146,7 @@ const TicketsScreen = ({navigation}) => {
       </View>
       <FlatList
         data={journeys}
+        extraData={journeys}
         keyExtractor={journey => journey.journey_id}
         renderItem={({item, index}) => (
           <TouchableOpacity
@@ -135,12 +160,9 @@ const TicketsScreen = ({navigation}) => {
             }
             ref={selectedJourney}
             onLongPress={() => {
-              console.log(selectedJourney.current);
-              selectedJourney.current.setNativeProps({
-                opacity: 0.2,
-              });
+              selectJourney(item);
             }}>
-            <View style={styles.journeyView}>
+            <View style={[styles.journeyView, item.style]}>
               <View style={styles.imageTrainLogoContainer}>
                 <Image source={require('../resources/train_placeholder.png')} />
               </View>
@@ -387,6 +409,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     height: 80,
+  },
+  journeyViewSelected: {
+    opacity: 0.5,
   },
   imageTrainLogoContainer: {
     backgroundColor: '#FFFFFF',
