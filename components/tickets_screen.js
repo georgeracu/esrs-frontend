@@ -16,6 +16,7 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
+  const [deleteIconVisibility, toggleDeleteIconVisibility] = useState('hidden');
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDate] = useState(
@@ -129,9 +130,27 @@ const TicketsScreen = ({navigation}) => {
 
   return (
     <View style={styles.root}>
-      <View style={styles.viewSeeTravels}>
-        <Text style={styles.textSeeTravels}>See your</Text>
-        <Text style={styles.textSeeTravels}>travels</Text>
+      <View style={styles.seeTravelsContainer}>
+        <View style={styles.viewSeeTravels}>
+          <Text style={styles.textSeeTravels}>See your</Text>
+          <Text style={styles.textSeeTravels}>journeys</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            const unselectedJourneys = journeys.filter(
+              journey => !journey.isSelected,
+            );
+            setJourneys(unselectedJourneys);
+            AsyncStorage.setItem(
+              'journeys',
+              JSON.stringify(unselectedJourneys),
+            );
+          }}>
+          <Image
+            style={'visibility: hidden'}
+            source={require('../resources/delete.png')}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.ticketsSearchIconContainer}>
         <TextInput style={styles.textInputTicketsSearch} />
@@ -308,6 +327,11 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'rgba(104, 126, 252, 0.1)',
     ...StyleSheet.absoluteFillObject,
+  },
+  seeTravelsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   viewSeeTravels: {
     marginBottom: 10,
