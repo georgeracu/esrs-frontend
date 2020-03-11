@@ -16,7 +16,7 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
-  const [hideIcon, toggleIcon] = useState(false);
+  const [selectedJourneysCount, updateSelectedJourneyCount] = useState(false);
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDate] = useState(
@@ -113,7 +113,7 @@ const TicketsScreen = ({navigation}) => {
   };
 
   /**
-   * Selects a journey item
+   * Selects a journey item and updates the count
    * @param item
    */
   const selectJourney = item => {
@@ -126,6 +126,8 @@ const TicketsScreen = ({navigation}) => {
     );
     journeys[index] = item;
     setJourneys([...journeys]);
+    const selectedJourneys = journeys.filter(journey => journey.isSelected);
+    updateSelectedJourneyCount(selectedJourneys);
   };
 
   return (
@@ -146,7 +148,7 @@ const TicketsScreen = ({navigation}) => {
               JSON.stringify(unselectedJourneys),
             );
           }}>
-          {hideIcon ? (
+          {selectedJourneysCount.length > 0 ? (
             <Image source={require('../resources/delete.png')} />
           ) : null}
         </TouchableOpacity>
@@ -165,12 +167,8 @@ const TicketsScreen = ({navigation}) => {
         renderItem={({item, index}) => (
           <TouchableOpacity
             onPress={() => {
-              const selectedJourneys = journeys.filter(
-                journey => journey.isSelected,
-              );
-              if (selectedJourneys.length > 0) {
-                selectJourney(item);
-              } else {
+              selectJourney(item);
+              if (selectedJourneysCount.length === 0) {
                 navigation.navigate('TicketDashboard', {
                   id: journeys[index].journey_id,
                   from: journeys[index].journey_from,
@@ -180,7 +178,6 @@ const TicketsScreen = ({navigation}) => {
               }
             }}
             onLongPress={() => {
-              toggleIcon(true);
               selectJourney(item);
             }}>
             <View style={[styles.journeyView, item.style]}>
