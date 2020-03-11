@@ -16,7 +16,7 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
-  const [deleteIconVisibility, toggleDeleteIconVisibility] = useState('hidden');
+  const [hideIcon, toggleIcon] = useState(false);
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDate] = useState(
@@ -146,10 +146,9 @@ const TicketsScreen = ({navigation}) => {
               JSON.stringify(unselectedJourneys),
             );
           }}>
-          <Image
-            style={'visibility: hidden'}
-            source={require('../resources/delete.png')}
-          />
+          {hideIcon ? (
+            <Image source={require('../resources/delete.png')} />
+          ) : null}
         </TouchableOpacity>
       </View>
       <View style={styles.ticketsSearchIconContainer}>
@@ -181,6 +180,7 @@ const TicketsScreen = ({navigation}) => {
               }
             }}
             onLongPress={() => {
+              toggleIcon(true);
               selectJourney(item);
             }}>
             <View style={[styles.journeyView, item.style]}>
