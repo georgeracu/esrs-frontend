@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {
     Alert,
-    AsyncStorage,
     StyleSheet,
     Text,
     TextInput,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import validator from 'validator';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-community/async-storage';
 import {sha256} from 'react-native-sha256';
 
 const RegisterScreen = ({navigation}) => {

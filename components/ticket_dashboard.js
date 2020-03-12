@@ -1,32 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
-  Alert,
-  FlatList,
   Image,
   ImageBackground,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Modal from 'react-native-modal';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
 import messaging from '@react-native-firebase/messaging';
 
 const TicketDashboard = ({route, navigation}) => {
   const {from, to, dateTime} = route.params;
 
   useEffect(() => {
-    async function doStuff() {
-      const enabled = await messaging().hasPermission();
-      console.log(enabled);
-      const fcmToken = await messaging().getToken();
-      console.log(fcmToken);
-    }
-    doStuff();
-    const unsubscribe = messaging().onMessage(remoteMessage => {
+    messaging().onMessage(remoteMessage => {
       console.log('FCM Message Data:', JSON.stringify(remoteMessage));
     });
   }, []);
