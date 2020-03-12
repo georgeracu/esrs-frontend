@@ -143,6 +143,7 @@ const TicketsScreen = ({navigation}) => {
               journey => !journey.isSelected,
             );
             setJourneys(unselectedJourneys);
+            updateSelectedJourneyCount(0);
             AsyncStorage.setItem(
               'journeys',
               JSON.stringify(unselectedJourneys),
@@ -164,6 +165,12 @@ const TicketsScreen = ({navigation}) => {
         data={journeys}
         extraData={journeys}
         keyExtractor={journey => journey.journey_id}
+        contentContainerStyle={
+          journeys.length > 0 ? styles.emptyStateNull : styles.emptyState
+        }
+        ListEmptyComponent={() => (
+          <Image source={require('../resources/empty_state.png')} />
+        )}
         renderItem={({item, index}) => (
           <TouchableOpacity
             onPress={() => {
@@ -490,4 +497,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
   },
+  emptyState: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateNull: {},
 });
