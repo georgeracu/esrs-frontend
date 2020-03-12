@@ -13,12 +13,7 @@ const TicketDashboard = ({route, navigation}) => {
   const {from, to, dateTime} = route.params;
 
   useEffect(() => {
-    async function doStuff() {
-      const enabled = await messaging().hasPermission();
-      const fcmToken = await messaging().getToken();
-    }
-    doStuff();
-    const unsubscribe = messaging().onMessage(remoteMessage => {
+    messaging().onMessage(remoteMessage => {
       console.log('FCM Message Data:', JSON.stringify(remoteMessage));
     });
   }, []);
