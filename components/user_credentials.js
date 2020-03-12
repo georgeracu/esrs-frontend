@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {
     Alert,
-    AsyncStorage,
     ScrollView,
     Picker,
     StyleSheet,
@@ -12,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import validator from 'validator';
+import AsyncStorage from '@react-native-community/async-storage';
 import generateFCMToken from '../utils/fcm';
 
 const UserCredentialsScreen = ({navigation}) => {

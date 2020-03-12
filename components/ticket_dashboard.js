@@ -1,18 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
-  Alert,
-  FlatList,
   Image,
   ImageBackground,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Modal from 'react-native-modal';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
 import messaging from '@react-native-firebase/messaging';
 
 const TicketDashboard = ({route, navigation}) => {

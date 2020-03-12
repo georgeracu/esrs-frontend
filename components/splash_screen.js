@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
-import {AsyncStorage, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const SplashScreen = ({navigation}) => {
   useEffect(() => {

@@ -1,7 +1,6 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Alert,
-  AsyncStorage,
   FlatList,
   Image,
   StyleSheet,
@@ -12,14 +11,15 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 
 const TicketsScreen = ({navigation}) => {
-  const [selectedJourneysCount, updateSelectedJourneyCount] = useState(false);
+  const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
-  const [journeyDay, setJourneyDate] = useState(
+  const [journeyDay, setJourneyDay] = useState(
     moment(new Date()).format('DD-MM-YYYY'),
   );
   const [journeyTime, setJourneyTime] = useState(
@@ -72,7 +72,7 @@ const TicketsScreen = ({navigation}) => {
       ? setJourneyFrom(stationName)
       : setJourneyTo(stationName);
     const results = stations.filter(station => {
-      return station.toLowerCase().startsWith(stationName);
+      return station.toLowerCase().startsWith(stationName.toLowerCase());
     });
     if (stationName === '') {
       setStationsSuggestions([]);
@@ -127,7 +127,7 @@ const TicketsScreen = ({navigation}) => {
     journeys[index] = item;
     setJourneys([...journeys]);
     const selectedJourneys = journeys.filter(journey => journey.isSelected);
-    updateSelectedJourneyCount(selectedJourneys);
+    updateSelectedJourneyCount(selectedJourneys.length);
   };
 
   return (
@@ -148,7 +148,7 @@ const TicketsScreen = ({navigation}) => {
               JSON.stringify(unselectedJourneys),
             );
           }}>
-          {selectedJourneysCount.length > 0 ? (
+          {selectedJourneysCount > 0 ? (
             <Image source={require('../resources/delete.png')} />
           ) : null}
         </TouchableOpacity>
@@ -167,8 +167,10 @@ const TicketsScreen = ({navigation}) => {
         renderItem={({item, index}) => (
           <TouchableOpacity
             onPress={() => {
-              selectJourney(item);
-              if (selectedJourneysCount.length === 0) {
+              if (selectedJourneysCount > 0) {
+                selectJourney(item);
+              }
+              if (selectedJourneysCount === 0) {
                 navigation.navigate('TicketDashboard', {
                   id: journeys[index].journey_id,
                   from: journeys[index].journey_from,
@@ -208,21 +210,29 @@ const TicketsScreen = ({navigation}) => {
             <TextInput
               value={journeyFrom}
               style={styles.textInputStationLeft}
-              placeholder="Departure Station:"
-              onChangeText={text => search(text.toLowerCase())}
+              placeholder="Depart"
+              onChangeText={text => search(text)}
               onFocus={() => toggleJourneyLocation('JF')}
             />
             <TextInput
               value={journeyTo}
               style={styles.textInputStationRight}
-              placeholder="Destination Station:"
-              onChangeText={text => search(text.toLowerCase())}
+              placeholder="Dest"
+              onChangeText={text => search(text)}
               onFocus={() => toggleJourneyLocation('JT')}
             />
+            <TouchableOpacity
+              style={styles.date}
+              onPress={() => toggleShowDateTime(true)}>
+              <Text style={styles.dateText}>
+                {journeyDay} {journeyTime}
+              </Text>
+            </TouchableOpacity>
           </View>
           <FlatList
             data={stationsSuggestions}
             keyExtractor={station => station}
+            showsHorizontalScrollIndicator={true}
             renderItem={({item}) => (
               <TouchableOpacity
                 onPress={() => {
@@ -235,20 +245,7 @@ const TicketsScreen = ({navigation}) => {
               </TouchableOpacity>
             )}
           />
-          <View style={styles.dateContainer}>
-            <Image
-              style={styles.dateIcon}
-              source={require('../resources/date.png')}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                toggleShowDateTime(true);
-              }}>
-              <Text style={styles.dateText}>
-                {journeyDay + ' ' + journeyTime}
-              </Text>
-            </TouchableOpacity>
-          </View>
+
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
@@ -256,7 +253,7 @@ const TicketsScreen = ({navigation}) => {
                 setStationsSuggestions([]);
                 setJourneyFrom('');
                 setJourneyTo('');
-                setJourneyDate(moment(new Date()).format('DD-MM-YYYY'));
+                setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
                 setJourneyTime(moment(new Date()).format('HH:mm'));
                 toggleModalVisibility(false);
               }}>
@@ -277,7 +274,7 @@ const TicketsScreen = ({navigation}) => {
                   addJourney();
                   setJourneyFrom('');
                   setJourneyTo('');
-                  setJourneyDate(moment(new Date()).format('DD-MM-YYYY'));
+                  setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
                   setJourneyTime(moment(new Date()).format('HH:mm'));
                   toggleModalVisibility(false);
                 }
@@ -303,7 +300,7 @@ const TicketsScreen = ({navigation}) => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
-                setJourneyDate(moment(newDate).format('DD-MM-YYYY'));
+                setJourneyDay(moment(newDate).format('DD-MM-YYYY'));
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
@@ -374,30 +371,36 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
+    maxHeight: 250,
   },
   textInputContainer: {
     flexDirection: 'row',
     borderBottomColor: '#CCCCCC',
     borderBottomWidth: 1,
+    justifyContent: 'space-around',
+    alignItems: 'center',
     fontFamily: 'sans-serif-light',
   },
   textInputStationLeft: {
-    height: 60,
-    padding: 20,
+    height: 50,
+    padding: 10,
     flexBasis: 1,
     flexGrow: 1,
     borderRightColor: '#CCCCCC',
     borderRightWidth: 1,
     backgroundColor: '#FFFFFF',
+    textAlign: 'center',
     borderTopLeftRadius: 8,
   },
   textInputStationRight: {
-    height: 60,
-    padding: 20,
+    height: 50,
+    padding: 10,
     flexBasis: 1,
     flexGrow: 1,
+    borderRightColor: '#CCCCCC',
+    borderRightWidth: 1,
+    textAlign: 'center',
     backgroundColor: '#FFFFFF',
-    borderTopRightRadius: 8,
   },
   selectDate: {
     fontFamily: 'sans-serif-thin',
@@ -413,7 +416,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3c3c3d',
     flexBasis: 1,
     flexGrow: 1,
-    padding: 20,
+    padding: 15,
     fontFamily: 'sans-serif-medium',
     fontSize: 15,
     borderBottomLeftRadius: 8,
@@ -423,7 +426,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#687DFC',
     flexBasis: 1,
     flexGrow: 1,
-    padding: 20,
+    padding: 15,
     fontFamily: 'sans-serif-medium',
     fontSize: 15,
     borderBottomRightRadius: 8,
@@ -465,28 +468,26 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   listItem: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 8,
+    marginBottom: 8,
     marginLeft: 20,
     marginRight: 20,
+    fontSize: 15,
     color: '#000000',
   },
   textModalButton: {
     color: '#FFFFFF',
     textAlign: 'center',
-    fontFamily: 'sans-serif-medium',
+    fontFamily: 'sans-serif-light',
   },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 15,
-  },
-  dateIcon: {
-    marginLeft: 20,
-    marginRight: 20,
+  date: {
+    flexBasis: 1,
+    flexGrow: 1,
+    borderTopRightRadius: 8,
   },
   dateText: {
     fontFamily: 'sans-serif-thin',
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
