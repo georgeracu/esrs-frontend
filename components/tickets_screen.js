@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   Image,
+  Picker,
   StyleSheet,
   Text,
   TextInput,
@@ -29,6 +30,10 @@ const TicketsScreen = ({navigation}) => {
 
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
   const [shouldShowDateTime, toggleShowDateTime] = useState(false);
+
+  const [journeyMedium, setJourneyMedium] = useState('Paper');
+  const [ticketType, setTicketType] = useState('Single');
+  const [nationalRailNumber, setNationalRailNumber] = useState('');
 
   const [isModalVisible, toggleModalVisibility] = useState(false);
 
@@ -252,6 +257,44 @@ const TicketsScreen = ({navigation}) => {
               </TouchableOpacity>
             )}
           />
+          <Picker
+            selectedValue={journeyMedium}
+            onValueChange={itemValue => {
+              setJourneyMedium(itemValue);
+            }}
+            mode="dropdown">
+            <Picker.Item label="Paper" value="Paper" />
+            <Picker.Item label="Touch Smartcard" value="Touch Smartcard" />
+            <Picker.Item label="E-ticket/M-ticket" value="E-ticket/M-ticket" />
+            <Picker.Item label="Oyster Card" value="Oyster Car" />
+            <Picker.Item label="Contactless" value="Contactless" />
+            <Picker.Item
+              label="Smartcard (other Train Company)"
+              value="Smartcard other Train Company"
+            />
+          </Picker>
+
+          <Picker
+            selectedValue={ticketType}
+            onValueChange={itemValue => {
+              setTicketType(itemValue);
+            }}
+            mode="dropdown">
+            <Picker.Item label="Single" value="Single" />
+            <Picker.Item label="Return" value="Return" />
+            <Picker.Item label="Weekly season" value="Weekly season" />
+            <Picker.Item label="Rover" value="Rover" />
+            <Picker.Item label="Ranger" value="Ranger" />
+            <Picker.Item label="Daily travel card" value="Daily travel card" />
+            <Picker.Item label="Carnet" value="Carnet" />
+          </Picker>
+
+          <TextInput
+            value={nationalRailNumber}
+            style={styles.textNationalRailNumber}
+            placeholder="National rail voucher"
+            onChangeText={text => setNationalRailNumber(text)}
+          />
 
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
@@ -407,6 +450,14 @@ const styles = StyleSheet.create({
     borderRightColor: '#CCCCCC',
     borderRightWidth: 1,
     textAlign: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  textNationalRailNumber: {
+    fontFamily: 'sans-serif-light',
+    height: 50,
+    padding: 10,
+    borderTopColor: '#CCCCCC',
+    borderTopWidth: 1,
     backgroundColor: '#FFFFFF',
   },
   selectDate: {
