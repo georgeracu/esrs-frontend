@@ -68,7 +68,6 @@ const UserCredentialsScreen = ({navigation}) => {
             'town_city': townCity,
             'postcode': postcode,
         };
-
         fetch('http://esrs.herokuapp.com/api/auth/user', {
             method: 'POST',
             headers: {

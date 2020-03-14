@@ -45,6 +45,13 @@ const LoginScreen = ({navigation}) => {
         const hash = await sha256(password);
         try {
             const credentials = await auth().signInWithEmailAndPassword(email, hash);
+
+            // Persist user's credentials
+            await generateFCMToken(credentials.user.uid);
+            await AsyncStorage.setItem('id', credentials.user.uid);
+            await AsyncStorage.setItem('email', email);
+            await AsyncStorage.setItem('password', hash);
+
             const response = await fetch('http://esrs.herokuapp.com/api/auth/user', {
                 headers: {
                     method: 'GET',
@@ -54,11 +61,6 @@ const LoginScreen = ({navigation}) => {
                 },
             });
             if (response.status === 200) {
-                await generateFCMToken(credentials.user.uid);
-                // Persist user's credentials
-                await AsyncStorage.setItem('id', credentials.user.uid);
-                await AsyncStorage.setItem('email', email);
-                await AsyncStorage.setItem('password', hash);
                 await AsyncStorage.setItem('isSignUpComplete', 'true');
                 const user = await response.json();
                 await AsyncStorage.setItem('journeys', JSON.stringify(user.journeys));
