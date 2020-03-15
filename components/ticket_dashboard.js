@@ -68,6 +68,11 @@ const TicketDashboard = ({route, navigation}) => {
       </View>
       <View style={styles.ticketButtonsContainer}>
         <TouchableOpacity>
+          <View style={styles.deleteBtn}>
+            <Text style={styles.claimSubmissionBtnTxt}>Delete</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity>
           <View style={styles.claimSubmissionBtn}>
             <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
           </View>
@@ -140,10 +145,16 @@ const styles = StyleSheet.create({
     padding: 30,
     marginTop: -30,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-around',
   },
   claimSubmissionBtn: {
     backgroundColor: '#5C5FC9',
+    borderRadius: 15,
+    padding: 20,
+    width: 150,
+  },
+  deleteBtn: {
+    backgroundColor: '#FA6B6B',
     borderRadius: 15,
     padding: 20,
     width: 150,

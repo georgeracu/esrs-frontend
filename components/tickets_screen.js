@@ -257,37 +257,47 @@ const TicketsScreen = ({navigation}) => {
               </TouchableOpacity>
             )}
           />
-          <Picker
-            selectedValue={journeyMedium}
-            onValueChange={itemValue => {
-              setJourneyMedium(itemValue);
-            }}
-            mode="dropdown">
-            <Picker.Item label="Paper" value="Paper" />
-            <Picker.Item label="Touch Smartcard" value="Touch Smartcard" />
-            <Picker.Item label="E-ticket/M-ticket" value="E-ticket/M-ticket" />
-            <Picker.Item label="Oyster Card" value="Oyster Car" />
-            <Picker.Item label="Contactless" value="Contactless" />
-            <Picker.Item
-              label="Smartcard (other Train Company)"
-              value="Smartcard other Train Company"
-            />
-          </Picker>
+          <View style={styles.pickerContainer}>
+            <Picker
+              style={styles.picker}
+              selectedValue={journeyMedium}
+              onValueChange={itemValue => {
+                setJourneyMedium(itemValue);
+              }}
+              mode="dropdown">
+              <Picker.Item label="Paper" value="Paper" />
+              <Picker.Item label="Touch Smartcard" value="Touch Smartcard" />
+              <Picker.Item
+                label="E-ticket/M-ticket"
+                value="E-ticket/M-ticket"
+              />
+              <Picker.Item label="Oyster Card" value="Oyster Car" />
+              <Picker.Item label="Contactless" value="Contactless" />
+              <Picker.Item
+                label="Smartcard (other Train Company)"
+                value="Smartcard other Train Company"
+              />
+            </Picker>
 
-          <Picker
-            selectedValue={ticketType}
-            onValueChange={itemValue => {
-              setTicketType(itemValue);
-            }}
-            mode="dropdown">
-            <Picker.Item label="Single" value="Single" />
-            <Picker.Item label="Return" value="Return" />
-            <Picker.Item label="Weekly season" value="Weekly season" />
-            <Picker.Item label="Rover" value="Rover" />
-            <Picker.Item label="Ranger" value="Ranger" />
-            <Picker.Item label="Daily travel card" value="Daily travel card" />
-            <Picker.Item label="Carnet" value="Carnet" />
-          </Picker>
+            <Picker
+              style={styles.picker}
+              selectedValue={ticketType}
+              onValueChange={itemValue => {
+                setTicketType(itemValue);
+              }}
+              mode="dropdown">
+              <Picker.Item label="Single" value="Single" />
+              <Picker.Item label="Return" value="Return" />
+              <Picker.Item label="Weekly season" value="Weekly season" />
+              <Picker.Item label="Rover" value="Rover" />
+              <Picker.Item label="Ranger" value="Ranger" />
+              <Picker.Item
+                label="Daily travel card"
+                value="Daily travel card"
+              />
+              <Picker.Item label="Carnet" value="Carnet" />
+            </Picker>
+          </View>
 
           <TextInput
             value={nationalRailNumber}
@@ -413,6 +423,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#687DFC',
+    elevation: 10,
   },
   textPlusSymbol: {
     fontSize: 30,
@@ -421,7 +432,8 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    maxHeight: 250,
+    maxHeight: 300,
+    elevation: 15,
   },
   textInputContainer: {
     flexDirection: 'row',
@@ -554,4 +566,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyStateNull: {},
+  pickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  picker: {
+    flexGrow: 1,
+  },
 });
