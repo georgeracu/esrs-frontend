@@ -8,15 +8,42 @@ import {
   View,
 } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const TicketDashboard = ({route, navigation}) => {
-  const {from, to, dateTime} = route.params;
+  const {id, from, to, dateTime} = route.params;
 
   useEffect(() => {
     messaging().onMessage(remoteMessage => {
       console.log('FCM Message Data:', JSON.stringify(remoteMessage));
     });
   }, []);
+
+  /**
+   * Delete journey
+   */
+  const deleteJourney = async () => {
+    const journeys = await AsyncStorage.getItem('journeys');
+    const parsedJourneys = JSON.parse(journeys);
+    const otherJourneys = parsedJourneys.filter(
+      journey => journey.journey_id !== id,
+    );
+
+    await AsyncStorage.setItem('journeys', JSON.stringify(otherJourneys));
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Tickets'}],
+    });
+    // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+    //   method: 'DELETE',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //     user_id: id,
+    //   },
+    // });
+  };
+
   return (
     <View style={styles.root}>
       <ImageBackground
@@ -67,7 +94,7 @@ const TicketDashboard = ({route, navigation}) => {
         </View>
       </View>
       <View style={styles.ticketButtonsContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={deleteJourney}>
           <View style={styles.deleteBtn}>
             <Text style={styles.claimSubmissionBtnTxt}>Delete</Text>
           </View>

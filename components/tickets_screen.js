@@ -576,8 +576,8 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingLeft: 12,
+    paddingRight: 12,
   },
   picker: {
     flexGrow: 1,
