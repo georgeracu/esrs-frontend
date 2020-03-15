@@ -139,18 +139,49 @@ const TicketsScreen = ({navigation}) => {
    * Delete journey(s)
    */
   const deleteJourney = () => {
-    const unselectedJourneys = journeys.filter(journey => !journey.isSelected);
-    setJourneys(unselectedJourneys);
-    updateSelectedJourneyCount(0);
-    AsyncStorage.setItem('journeys', JSON.stringify(unselectedJourneys));
-    fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-      method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        user_id: id,
-      },
-    });
+    Alert.alert(
+      'Delete Journey',
+      'Are you sure you want to delete your journeys?',
+      [
+        {
+          text: 'No',
+          onPress: () => {
+            updateSelectedJourneyCount(0);
+            journeys.map(journey => {
+              if (journey.isSelected) {
+                journey.isSelected = false;
+                journey.style = styles.journeyView;
+              }
+            });
+            setJourneys([]);
+            setJourneys([...journeys]);
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            const unselectedJourneys = journeys.filter(
+              journey => !journey.isSelected,
+            );
+            setJourneys(unselectedJourneys);
+            updateSelectedJourneyCount(0);
+            AsyncStorage.setItem(
+              'journeys',
+              JSON.stringify(unselectedJourneys),
+            );
+            // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+            //   method: 'DELETE',
+            //   headers: {
+            //     Accept: 'application/json',
+            //     'Content-Type': 'application/json',
+            //     user_id: id,
+            //   },
+            // });
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -160,7 +191,10 @@ const TicketsScreen = ({navigation}) => {
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>journeys</Text>
         </View>
-        <TouchableOpacity onPress={() => deleteJourney}>
+        <TouchableOpacity
+          onPress={() => {
+            deleteJourney();
+          }}>
           {selectedJourneysCount > 0 ? (
             <Image source={require('../resources/delete.png')} />
           ) : null}
@@ -336,6 +370,11 @@ const TicketsScreen = ({navigation}) => {
                   Alert.alert(
                     'Add Journey',
                     'Oops, looks like you are missing something',
+                  );
+                } else if (journeyFrom === journeyTo) {
+                  Alert.alert(
+                    'Add Journey',
+                    "Oops, Departure and Destination can't be same",
                   );
                 } else {
                   addJourney();

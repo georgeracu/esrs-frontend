@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
   StyleSheet,
@@ -23,25 +24,42 @@ const TicketDashboard = ({route, navigation}) => {
    * Delete journey
    */
   const deleteJourney = async () => {
-    const journeys = await AsyncStorage.getItem('journeys');
-    const parsedJourneys = JSON.parse(journeys);
-    const otherJourneys = parsedJourneys.filter(
-      journey => journey.journey_id !== id,
+    Alert.alert(
+      'Delete Journey',
+      'Are you sure you want to delete your journeys?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            const journeys = await AsyncStorage.getItem('journeys');
+            const parsedJourneys = JSON.parse(journeys);
+            const otherJourneys = parsedJourneys.filter(
+              journey => journey.journey_id !== id,
+            );
+            await AsyncStorage.setItem(
+              'journeys',
+              JSON.stringify(otherJourneys),
+            );
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Tickets'}],
+            });
+            // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+            //   method: 'DELETE',
+            //   headers: {
+            //     Accept: 'application/json',
+            //     'Content-Type': 'application/json',
+            //     user_id: id,
+            //   },
+            // });
+          },
+        },
+      ],
     );
-
-    await AsyncStorage.setItem('journeys', JSON.stringify(otherJourneys));
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Tickets'}],
-    });
-    // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-    //   method: 'DELETE',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //     user_id: id,
-    //   },
-    // });
   };
 
   return (
