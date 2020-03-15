@@ -135,6 +135,24 @@ const TicketsScreen = ({navigation}) => {
     updateSelectedJourneyCount(selectedJourneys.length);
   };
 
+  /**
+   * Delete journey(s)
+   */
+  const deleteJourney = () => {
+    const unselectedJourneys = journeys.filter(journey => !journey.isSelected);
+    setJourneys(unselectedJourneys);
+    updateSelectedJourneyCount(0);
+    AsyncStorage.setItem('journeys', JSON.stringify(unselectedJourneys));
+    fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        user_id: id,
+      },
+    });
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.seeTravelsContainer}>
@@ -142,18 +160,7 @@ const TicketsScreen = ({navigation}) => {
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>journeys</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            const unselectedJourneys = journeys.filter(
-              journey => !journey.isSelected,
-            );
-            setJourneys(unselectedJourneys);
-            updateSelectedJourneyCount(0);
-            AsyncStorage.setItem(
-              'journeys',
-              JSON.stringify(unselectedJourneys),
-            );
-          }}>
+        <TouchableOpacity onPress={() => deleteJourney}>
           {selectedJourneysCount > 0 ? (
             <Image source={require('../resources/delete.png')} />
           ) : null}
