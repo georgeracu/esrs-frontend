@@ -12,7 +12,19 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const TicketDashboard = ({route, navigation}) => {
-  const {id, from, to, dateTime} = route.params;
+  const {
+    id,
+    from,
+    to,
+    dateTime,
+    medium,
+    type,
+    price,
+    number,
+    nationalRailNumber,
+  } = route.params;
+
+  console.log(route.params);
 
   useEffect(() => {
     messaging().onMessage(remoteMessage => {

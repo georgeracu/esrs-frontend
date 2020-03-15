@@ -33,6 +33,8 @@ const TicketsScreen = ({navigation}) => {
 
   const [journeyMedium, setJourneyMedium] = useState('Paper');
   const [ticketType, setTicketType] = useState('Single');
+  const [ticketNumber, setTicketNumber] = useState('');
+  const [ticketPrice, setTicketPrice] = useState('');
   const [nationalRailNumber, setNationalRailNumber] = useState('');
 
   const [isModalVisible, toggleModalVisibility] = useState(false);
@@ -97,6 +99,11 @@ const TicketsScreen = ({navigation}) => {
       journey_from: journeyFrom,
       journey_to: journeyTo,
       journey_datetime: `${journeyDay} ${journeyTime}`,
+      journey_medium: journeyMedium,
+      ticket_type: ticketType,
+      ticket_price: ticketPrice,
+      ticket_number: ticketNumber,
+      national_rail_number: nationalRailNumber,
     };
     const response = await fetch(
       'http://esrs.herokuapp.com/api/auth/user/journey',
@@ -111,10 +118,55 @@ const TicketsScreen = ({navigation}) => {
       },
     );
 
+    console.log(response);
     if (response.status === 200) {
       setJourneys([...journeys, journey]);
       AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
     }
+  };
+
+  /**
+   * Validate journey inputs
+   */
+  const validateJourney = () => {
+    if (
+      !stationsCodes.includes(journeyFrom) ||
+      !stationsCodes.includes(journeyTo) ||
+      ticketNumber === '' ||
+      ticketPrice === ''
+    ) {
+      Alert.alert('Add Journey', 'Oops, looks like you are missing something');
+    } else if (journeyFrom === journeyTo) {
+      Alert.alert(
+        'Add Journey',
+        "Oops, Departure and Destination can't be same",
+      );
+    } else {
+      addJourney();
+      setJourneyFrom('');
+      setJourneyTo('');
+      setTicketNumber('');
+      setTicketPrice('');
+      setNationalRailNumber('');
+      setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
+      setJourneyTime(moment(new Date()).format('HH:mm'));
+      toggleModalVisibility(false);
+    }
+  };
+
+  /**
+   * Cancel adding a journey
+   */
+  const cancelJourney = () => {
+    setStationsSuggestions([]);
+    setJourneyFrom('');
+    setJourneyTo('');
+    setTicketNumber('');
+    setTicketPrice('');
+    setNationalRailNumber('');
+    setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
+    setJourneyTime(moment(new Date()).format('HH:mm'));
+    toggleModalVisibility(false);
   };
 
   /**
@@ -229,6 +281,11 @@ const TicketsScreen = ({navigation}) => {
                   from: journeys[index].journey_from,
                   to: journeys[index].journey_to,
                   dateTime: journeys[index].journey_datetime,
+                  medium: journeys[index].journey_medium,
+                  type: journeys[index].ticket_type,
+                  price: journeys[index].ticket_price,
+                  number: journeys[index].ticket_number,
+                  nationalRailNumber: journeys[index].nationalRailNumber,
                 });
               }
             }}
@@ -341,8 +398,23 @@ const TicketsScreen = ({navigation}) => {
           </View>
 
           <TextInput
+            value={ticketNumber}
+            style={styles.textInputBasic}
+            placeholder="Ticket Number"
+            onChangeText={text => setTicketNumber(text)}
+          />
+
+          <TextInput
+            value={ticketPrice}
+            style={styles.textInputBasic}
+            placeholder="Ticket Price"
+            keyboardType={'numeric'}
+            onChangeText={text => setTicketPrice(text)}
+          />
+
+          <TextInput
             value={nationalRailNumber}
-            style={styles.textNationalRailNumber}
+            style={styles.textInputBasic}
             placeholder="National rail voucher"
             onChangeText={text => setNationalRailNumber(text)}
           />
@@ -350,41 +422,12 @@ const TicketsScreen = ({navigation}) => {
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
-              onPress={() => {
-                setStationsSuggestions([]);
-                setJourneyFrom('');
-                setJourneyTo('');
-                setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
-                setJourneyTime(moment(new Date()).format('HH:mm'));
-                toggleModalVisibility(false);
-              }}>
+              onPress={() => cancelJourney()}>
               <Text style={styles.textModalButton}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.modalButtonRight}
-              onPress={() => {
-                if (
-                  !stationsCodes.includes(journeyFrom) ||
-                  !stationsCodes.includes(journeyTo)
-                ) {
-                  Alert.alert(
-                    'Add Journey',
-                    'Oops, looks like you are missing something',
-                  );
-                } else if (journeyFrom === journeyTo) {
-                  Alert.alert(
-                    'Add Journey',
-                    "Oops, Departure and Destination can't be same",
-                  );
-                } else {
-                  addJourney();
-                  setJourneyFrom('');
-                  setJourneyTo('');
-                  setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
-                  setJourneyTime(moment(new Date()).format('HH:mm'));
-                  toggleModalVisibility(false);
-                }
-              }}>
+              onPress={() => validateJourney()}>
               <Text style={styles.textModalButton}>Add Journey</Text>
             </TouchableOpacity>
           </View>
@@ -478,7 +521,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    maxHeight: 300,
+    maxHeight: 400,
     elevation: 15,
   },
   textInputContainer: {
@@ -510,7 +553,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     backgroundColor: '#FFFFFF',
   },
-  textNationalRailNumber: {
+  textInputBasic: {
     fontFamily: 'sans-serif-light',
     height: 50,
     padding: 10,
