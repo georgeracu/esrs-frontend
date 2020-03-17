@@ -15,6 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import {sha256} from 'react-native-sha256';
+import {stations} from '../utils/stations';
 
 const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
@@ -43,10 +44,13 @@ const TicketsScreen = ({navigation}) => {
 
   const [id, setId] = useState('');
 
+  const [stationsSuggestions, setStationsSuggestions] = useState([]);
+
   useEffect(() => {
     async function getPersistedJourneys() {
       setId(await AsyncStorage.getItem('id'));
       const persistedJourneys = await AsyncStorage.getItem('journeys');
+      console.log(persistedJourneys);
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
@@ -60,25 +64,15 @@ const TicketsScreen = ({navigation}) => {
     getPersistedJourneys();
   }, []);
 
-  const [stationsSuggestions, setStationsSuggestions] = useState([]);
-
-  const stationsAndCodesJson = require('../resources/stations_and_codes');
-  const stationsAndCodes = new Map();
-  stationsAndCodesJson.forEach(stationAndCode => {
-    stationsAndCodes.set(stationAndCode.key, stationAndCode.value);
-  });
-  const stations = Array.from(stationsAndCodes.keys());
-  const stationsCodes = Array.from(stationsAndCodes.values());
-
   /**
    * Returns matching stations
    * @param stationName
    */
-  const search = stationName => {
+  const searchJourneys = stationName => {
     journeyLocation === 'JF'
       ? setJourneyFrom(stationName)
       : setJourneyTo(stationName);
-    const results = stations.filter(station => {
+    const results = stations.names.filter(station => {
       return station.toLowerCase().startsWith(stationName.toLowerCase());
     });
     if (stationName === '') {
@@ -105,33 +99,30 @@ const TicketsScreen = ({navigation}) => {
       ticket_number: ticketNumber,
       national_rail_number: nationalRailNumber,
     };
-    const response = await fetch(
-      'http://esrs.herokuapp.com/api/auth/user/journey',
-      {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          user_id: id,
-        },
-        body: JSON.stringify(journey),
-      },
-    );
+    setJourneys([...journeys, journey]);
+    delete journey.isSelected;
+    delete journey.style;
+    AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
-    console.log(response);
-    if (response.status === 200) {
-      setJourneys([...journeys, journey]);
-      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
-    }
+    // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+    //   method: 'PUT',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //     user_id: id,
+    //   },
+    //   body: JSON.stringify(journey),
+    // });
   };
 
   /**
    * Validate journey inputs
    */
   const validateJourney = () => {
+    console.log(journeys);
     if (
-      !stationsCodes.includes(journeyFrom) ||
-      !stationsCodes.includes(journeyTo) ||
+      !stations.codes.includes(journeyFrom) ||
+      !stations.codes.includes(journeyTo) ||
       ticketNumber === '' ||
       ticketPrice === ''
     ) {
@@ -285,7 +276,7 @@ const TicketsScreen = ({navigation}) => {
                   type: journeys[index].ticket_type,
                   price: journeys[index].ticket_price,
                   number: journeys[index].ticket_number,
-                  nationalRailNumber: journeys[index].nationalRailNumber,
+                  NRailNumber: journeys[index].national_rail_number,
                 });
               }
             }}
@@ -321,14 +312,14 @@ const TicketsScreen = ({navigation}) => {
               value={journeyFrom}
               style={styles.textInputStationLeft}
               placeholder="Depart"
-              onChangeText={text => search(text)}
+              onChangeText={text => searchJourneys(text)}
               onFocus={() => toggleJourneyLocation('JF')}
             />
             <TextInput
               value={journeyTo}
               style={styles.textInputStationRight}
               placeholder="Dest"
-              onChangeText={text => search(text)}
+              onChangeText={text => searchJourneys(text)}
               onFocus={() => toggleJourneyLocation('JT')}
             />
             <TouchableOpacity
@@ -347,8 +338,8 @@ const TicketsScreen = ({navigation}) => {
               <TouchableOpacity
                 onPress={() => {
                   journeyLocation === 'JF'
-                    ? setJourneyFrom(stationsAndCodes.get(item))
-                    : setJourneyTo(stationsAndCodes.get(item));
+                    ? setJourneyFrom(stations.stationsAndCodes.get(item))
+                    : setJourneyTo(stations.stationsAndCodes.get(item));
                   setStationsSuggestions([]);
                 }}>
                 <Text style={styles.listItem}>{item}</Text>
@@ -369,7 +360,7 @@ const TicketsScreen = ({navigation}) => {
                 label="E-ticket/M-ticket"
                 value="E-ticket/M-ticket"
               />
-              <Picker.Item label="Oyster Card" value="Oyster Car" />
+              <Picker.Item label="Oyster Card" value="Oyster Card" />
               <Picker.Item label="Contactless" value="Contactless" />
               <Picker.Item
                 label="Smartcard (other Train Company)"
