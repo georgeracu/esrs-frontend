@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 import {stations} from '../utils/stations';
+import ImagePicker from 'react-native-image-picker';
 
 const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
@@ -37,6 +38,7 @@ const TicketsScreen = ({navigation}) => {
   const [ticketNumber, setTicketNumber] = useState('');
   const [ticketPrice, setTicketPrice] = useState('');
   const [nationalRailNumber, setNationalRailNumber] = useState('');
+  
 
   const [isModalVisible, toggleModalVisibility] = useState(false);
 
@@ -45,6 +47,8 @@ const TicketsScreen = ({navigation}) => {
   const [id, setId] = useState('');
 
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
+
+  const [ticketImage, setTicketImage] = useState({});
 
   useEffect(() => {
     async function getPersistedJourneys() {
@@ -63,6 +67,27 @@ const TicketsScreen = ({navigation}) => {
     }
     getPersistedJourneys();
   }, []);
+
+  const options = {
+    title: 'Get A Ticket Picture',
+  };
+
+  const selectImage = () => {
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+    
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = { uri: response.uri, data: response.data, name: response.fileName };
+        setTicketImage(source);
+      }
+    });
+  }
 
   /**
    * Returns matching stations
@@ -124,7 +149,9 @@ const TicketsScreen = ({navigation}) => {
       !stations.codes.includes(journeyFrom) ||
       !stations.codes.includes(journeyTo) ||
       ticketNumber === '' ||
-      ticketPrice === ''
+      ticketPrice === '' ||
+      JSON.stringify(ticketImage) === JSON.stringify({}) 
+
     ) {
       Alert.alert('Add Journey', 'Oops, looks like you are missing something');
     } else if (journeyFrom === journeyTo) {
@@ -149,6 +176,7 @@ const TicketsScreen = ({navigation}) => {
    * Cancel adding a journey
    */
   const cancelJourney = () => {
+    setTicketImage({});
     setStationsSuggestions([]);
     setJourneyFrom('');
     setJourneyTo('');
@@ -410,6 +438,20 @@ const TicketsScreen = ({navigation}) => {
             onChangeText={text => setNationalRailNumber(text)}
           />
 
+          <TextInput
+            editable={false}
+            style={styles.textInputBasicImage}
+            placeholder={JSON.stringify(ticketImage) === JSON.stringify({})  ? "No Image" : "Image Selected"}
+          />
+
+          <View style={styles.modalButtonsContainer}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => selectImage()}>
+              <Text style={styles.textModalButton}>{JSON.stringify(ticketImage) === JSON.stringify({})  ? "Select An Image" : "Change Image"}</Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButtonLeft}
@@ -514,6 +556,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     maxHeight: 400,
     elevation: 15,
+    zIndex: 5
   },
   textInputContainer: {
     flexDirection: 'row',
@@ -552,6 +595,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     backgroundColor: '#FFFFFF',
   },
+  textInputBasicImage: {
+    fontFamily: 'sans-serif-light',
+    height: 50,
+    padding: 10,
+    borderTopColor: '#CCCCCC',
+    borderTopWidth: 1,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',  
+  },
   selectDate: {
     fontFamily: 'sans-serif-thin',
     fontSize: 15,
@@ -560,6 +612,24 @@ const styles = StyleSheet.create({
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+  },
+  modalButtonRemove: {
+    color: '#FFFFFF',
+    backgroundColor: '#4F646F',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 15,
+    fontFamily: 'sans-serif-medium',
+    fontSize: 15,
+  },
+  modalButton: {
+    color: '#FFFFFF',
+    backgroundColor: '#272838',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 15,
+    fontFamily: 'sans-serif-medium',
+    fontSize: 15,
   },
   modalButtonLeft: {
     color: '#FFFFFF',

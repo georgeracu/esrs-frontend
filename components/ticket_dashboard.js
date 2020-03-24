@@ -46,7 +46,7 @@ const TicketDashboard = ({route, navigation}) => {
   const [ticketNumber, setTicketNumber] = useState(number);
   const [ticketPrice, setTicketPrice] = useState(price);
   const [nationalRailNumber, setNationalRailNumber] = useState(NRailNumber);
-
+  
   const [isModalVisible, toggleModalVisibility] = useState(false);
 
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
