@@ -2,13 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {
   Alert,
   BackHandler,
-  FlatList,
   Image,
   ImageBackground,
-  Picker,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -16,9 +13,8 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import {stations} from '../utils/stations';
-import Modal from 'react-native-modal';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import {useFocusEffect} from '@react-navigation/native';
+import AddJourneyModal from './add_journey_modal';
 const TicketDashboard = ({route, navigation}) => {
   const {
     id,
@@ -37,9 +33,6 @@ const TicketDashboard = ({route, navigation}) => {
   const [journeyDay, setJourneyDay] = useState(dateTime.split(' ')[0]);
   const [journeyTime, setJourneyTime] = useState(dateTime.split(' ')[1]);
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
-
-  const [dateTimeMode, toggleDateTimeMode] = useState('date');
-  const [shouldShowDateTime, toggleShowDateTime] = useState(false);
 
   const [journeyMedium, setJourneyMedium] = useState(medium);
   const [ticketType, setTicketType] = useState(type);
@@ -89,7 +82,7 @@ const TicketDashboard = ({route, navigation}) => {
    * Returns matching stations
    * @param stationName
    */
-  const searchJourneys = stationName => {
+  const searchStation = stationName => {
     journeyLocation === 'JF'
       ? setJourneyFrom(stationName)
       : setJourneyTo(stationName);
@@ -107,53 +100,59 @@ const TicketDashboard = ({route, navigation}) => {
    * Adds a new journey
    */
   const updateJourney = async () => {
-    setJourneyFrom(journeyFrom);
-    setJourneyTo(journeyTo);
-    setJourneyDay(journeyDay);
-    setJourneyTime(journeyTime);
-    setJourneyMedium(journeyMedium);
-    setTicketType(ticketType);
-    setTicketPrice(ticketPrice);
-    setTicketNumber(ticketNumber);
-    setNationalRailNumber(nationalRailNumber);
+    const isValid = validateJourney();
+    if (isValid) {
+      setJourneyFrom(journeyFrom);
+      setJourneyTo(journeyTo);
+      setJourneyDay(journeyDay);
+      setJourneyTime(journeyTime);
+      setJourneyMedium(journeyMedium);
+      setTicketType(ticketType);
+      setTicketPrice(ticketPrice);
+      setTicketNumber(ticketNumber);
+      setNationalRailNumber(nationalRailNumber);
 
-    const newJourney = {
-      journey_from: journeyFrom,
-      journey_to: journeyTo,
-      journey_datetime: `${journeyDay} ${journeyTime}`,
-      journey_medium: journeyMedium,
-      ticket_type: ticketType,
-      ticket_price: ticketPrice,
-      ticket_number: ticketNumber,
-      national_rail_number: nationalRailNumber,
-    };
+      const newJourney = {
+        journey_from: journeyFrom,
+        journey_to: journeyTo,
+        journey_datetime: `${journeyDay} ${journeyTime}`,
+        journey_medium: journeyMedium,
+        ticket_type: ticketType,
+        ticket_price: ticketPrice,
+        ticket_number: ticketNumber,
+        national_rail_number: nationalRailNumber,
+      };
 
-    const newJourneys = journeys.map(journey => {
-      if (journey.journey_id === id) {
-        newJourney.journey_id = journey.journey_id;
-        return newJourney;
-      }
-    });
+      const newJourneys = journeys.map(journey => {
+        if (journey.journey_id === id) {
+          newJourney.journey_id = journey.journey_id;
+          return newJourney;
+        }
+      });
 
-    AsyncStorage.setItem('journeys', JSON.stringify(newJourneys));
+      AsyncStorage.setItem('journeys', JSON.stringify(newJourneys));
 
-    delete newJourney.id;
+      delete newJourney.id;
 
-    fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        user_id: id,
-      },
-      body: JSON.stringify(newJourney),
-    });
+      toggleModalVisibility(false);
+
+      fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          user_id: id,
+        },
+        body: JSON.stringify(newJourney),
+      });
+    }
   };
 
   /**
    * Validate journey inputs
    */
   const validateJourney = () => {
+    let isValid = true;
     if (
       !stations.codes.includes(journeyFrom) ||
       !stations.codes.includes(journeyTo) ||
@@ -161,15 +160,15 @@ const TicketDashboard = ({route, navigation}) => {
       ticketPrice === ''
     ) {
       Alert.alert('Add Journey', 'Oops, looks like you are missing something');
+      isValid = false;
     } else if (journeyFrom === journeyTo) {
       Alert.alert(
         'Add Journey',
         "Oops, Departure and Destination can't be same",
       );
-    } else {
-      updateJourney();
-      toggleModalVisibility(false);
+      isValid = false;
     }
+    return isValid;
   };
 
   /**
@@ -261,13 +260,6 @@ const TicketDashboard = ({route, navigation}) => {
           </View>
         </View>
         <View style={styles.ticketDetailView}>
-          <Image source={require('../resources/round-trip.png')} />
-          <View style={styles.ticketDetailTextContainer}>
-            <Text style={styles.ticketDetailLabelText}>Journey Medium</Text>
-            <Text style={styles.ticketDetailText}>{journeyMedium}</Text>
-          </View>
-        </View>
-        <View style={styles.ticketDetailView}>
           <Image source={require('../resources/tiny_date.png')} />
           <View style={styles.ticketDetailTextContainer}>
             <Text style={styles.ticketDetailLabelText}>Date</Text>
@@ -289,151 +281,33 @@ const TicketDashboard = ({route, navigation}) => {
           </View>
         </TouchableOpacity>
       </View>
-      <Modal isVisible={isModalVisible}>
-        <View style={styles.modal}>
-          <View style={styles.textInputContainer}>
-            <TextInput
-              value={journeyFrom}
-              style={styles.textInputStationLeft}
-              placeholder="Depart"
-              onChangeText={text => searchJourneys(text)}
-              onFocus={() => toggleJourneyLocation('JF')}
-            />
-            <TextInput
-              value={journeyTo}
-              style={styles.textInputStationRight}
-              placeholder="Dest"
-              onChangeText={text => searchJourneys(text)}
-              onFocus={() => toggleJourneyLocation('JT')}
-            />
-            <TouchableOpacity
-              style={styles.date}
-              onPress={() => toggleShowDateTime(true)}>
-              <Text style={styles.dateText}>
-                {journeyDay} {journeyTime}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={stationsSuggestions}
-            keyExtractor={station => station}
-            showsHorizontalScrollIndicator={true}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                onPress={() => {
-                  journeyLocation === 'JF'
-                    ? setJourneyFrom(stations.stationsAndCodes.get(item))
-                    : setJourneyTo(stations.stationsAndCodes.get(item));
-                  setStationsSuggestions([]);
-                }}>
-                <Text style={styles.listItem}>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-          <View style={styles.pickerContainer}>
-            <Picker
-              style={styles.picker}
-              selectedValue={journeyMedium}
-              onValueChange={itemValue => {
-                setJourneyMedium(itemValue);
-              }}
-              mode="dropdown">
-              <Picker.Item label="Paper" value="Paper" />
-              <Picker.Item label="Touch Smartcard" value="Touch Smartcard" />
-              <Picker.Item
-                label="E-ticket/M-ticket"
-                value="E-ticket/M-ticket"
-              />
-              <Picker.Item label="Oyster Card" value="Oyster Card" />
-              <Picker.Item label="Contactless" value="Contactless" />
-              <Picker.Item
-                label="Smartcard (other Train Company)"
-                value="Smartcard other Train Company"
-              />
-            </Picker>
-
-            <Picker
-              style={styles.picker}
-              selectedValue={ticketType}
-              onValueChange={itemValue => {
-                setTicketType(itemValue);
-              }}
-              mode="dropdown">
-              <Picker.Item label="Single" value="Single" />
-              <Picker.Item label="Return" value="Return" />
-              <Picker.Item label="Weekly season" value="Weekly season" />
-              <Picker.Item label="Rover" value="Rover" />
-              <Picker.Item label="Ranger" value="Ranger" />
-              <Picker.Item
-                label="Daily travel card"
-                value="Daily travel card"
-              />
-              <Picker.Item label="Carnet" value="Carnet" />
-            </Picker>
-          </View>
-
-          <TextInput
-            value={ticketNumber}
-            style={styles.textInputBasic}
-            placeholder="Ticket Number"
-            onChangeText={text => setTicketNumber(text)}
-          />
-
-          <TextInput
-            value={ticketPrice}
-            style={styles.textInputBasic}
-            placeholder="Ticket Price"
-            keyboardType={'numeric'}
-            onChangeText={text => setTicketPrice(text)}
-          />
-
-          <TextInput
-            value={nationalRailNumber}
-            style={styles.textInputBasic}
-            placeholder="National rail voucher"
-            onChangeText={text => setNationalRailNumber(text)}
-          />
-
-          <View style={styles.modalButtonsContainer}>
-            <TouchableOpacity
-              style={styles.modalButtonLeft}
-              onPress={() => cancelJourney()}>
-              <Text style={styles.textModalButton}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalButtonRight}
-              onPress={() => validateJourney()}>
-              <Text style={styles.textModalButton}>Edit Journey</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {shouldShowDateTime && (
-        <DateTimePicker
-          timeZoneOffsetInMinutes={0}
-          value={new Date()}
-          mode={dateTimeMode}
-          is24Hour={true}
-          display="default"
-          onChange={(event, newDate) => {
-            if (event.type === 'dismissed') {
-              toggleShowDateTime(false);
-              toggleDateTimeMode('date');
-            } else {
-              if (dateTimeMode === 'date') {
-                toggleShowDateTime(false);
-                toggleDateTimeMode('time');
-                toggleShowDateTime(true);
-                setJourneyDay(moment(newDate).format('DD-MM-YYYY'));
-              } else if (dateTimeMode === 'time') {
-                toggleShowDateTime(false);
-                toggleDateTimeMode('date');
-                setJourneyTime(moment(newDate).format('HH:mm'));
-              }
-            }
-          }}
-        />
-      )}
+      <AddJourneyModal
+        visible={isModalVisible}
+        onCancel={cancelJourney}
+        onAddJourney={updateJourney}
+        onSearchStation={searchStation}
+        onDepartStationInputFocus={() => toggleJourneyLocation('JF')}
+        onDestStationInputFocus={() => toggleJourneyLocation('JT')}
+        stations={stationsSuggestions}
+        onSelectStation={station => {
+          journeyLocation === 'JF'
+            ? setJourneyFrom(stations.stationsAndCodes.get(station))
+            : setJourneyTo(stations.stationsAndCodes.get(station));
+          setStationsSuggestions([]);
+        }}
+        onTicketNumberChange={number => setTicketNumber(number)}
+        onTicketPriceChange={price => setTicketPrice(price)}
+        onSetJourneyDay={newDate =>
+          setJourneyDay(moment(newDate).format('DD-MM-YYYY'))
+        }
+        onSetJourneyTime={newDate =>
+          setJourneyTime(moment(newDate).format('HH:mm'))
+        }
+        departStation={journeyFrom}
+        destStation={journeyTo}
+        journeyDay={journeyDay}
+        journeyTime={journeyTime}
+      />
     </View>
   );
 };
@@ -519,109 +393,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     fontFamily: 'sans-serif-medium',
-  },
-  modal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    maxHeight: 400,
-    elevation: 15,
-  },
-  textInputContainer: {
-    flexDirection: 'row',
-    borderBottomColor: '#CCCCCC',
-    borderBottomWidth: 1,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    fontFamily: 'sans-serif-light',
-  },
-  textInputStationLeft: {
-    height: 50,
-    padding: 10,
-    flexBasis: 1,
-    flexGrow: 1,
-    borderRightColor: '#CCCCCC',
-    borderRightWidth: 1,
-    backgroundColor: '#FFFFFF',
-    textAlign: 'center',
-    borderTopLeftRadius: 8,
-  },
-  textInputStationRight: {
-    height: 50,
-    padding: 10,
-    flexBasis: 1,
-    flexGrow: 1,
-    borderRightColor: '#CCCCCC',
-    borderRightWidth: 1,
-    textAlign: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  textInputBasic: {
-    fontFamily: 'sans-serif-light',
-    height: 50,
-    padding: 10,
-    borderTopColor: '#CCCCCC',
-    borderTopWidth: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  selectDate: {
-    fontFamily: 'sans-serif-thin',
-    fontSize: 15,
-    color: '#FFFFFF',
-  },
-  modalButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  modalButtonLeft: {
-    color: '#FFFFFF',
-    backgroundColor: '#3c3c3d',
-    flexBasis: 1,
-    flexGrow: 1,
-    padding: 15,
-    fontFamily: 'sans-serif-medium',
-    fontSize: 15,
-    borderBottomLeftRadius: 8,
-  },
-  modalButtonRight: {
-    color: '#FFFFFF',
-    backgroundColor: '#687DFC',
-    flexBasis: 1,
-    flexGrow: 1,
-    padding: 15,
-    fontFamily: 'sans-serif-medium',
-    fontSize: 15,
-    borderBottomRightRadius: 8,
-  },
-  listItem: {
-    marginTop: 8,
-    marginBottom: 8,
-    marginLeft: 20,
-    marginRight: 20,
-    fontSize: 15,
-    color: '#000000',
-  },
-  textModalButton: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontFamily: 'sans-serif-light',
-  },
-  date: {
-    flexBasis: 1,
-    flexGrow: 1,
-    borderTopRightRadius: 8,
-  },
-  dateText: {
-    fontFamily: 'sans-serif-thin',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  pickerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingLeft: 12,
-    paddingRight: 12,
-  },
-  picker: {
-    flexGrow: 1,
   },
 });
