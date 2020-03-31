@@ -19,6 +19,7 @@ import TicketsScreen from './components/tickets_screen';
 import TicketDashboard from './components/ticket_dashboard';
 import ClaimsScreen from './components/claims_screen';
 import messaging from '@react-native-firebase/messaging';
+import CameraScreen from './components/camera_screen';
 
 function App() {
   useEffect(() => {
@@ -48,6 +49,7 @@ function App() {
           component={UserCredentialsScreen}
         />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
         <Stack.Screen name="Tickets" component={TicketsScreen} />
         <Stack.Screen name="TicketDashboard" component={TicketDashboard} />
         <Stack.Screen name="Claims" component={ClaimsScreen} />
