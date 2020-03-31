@@ -283,7 +283,7 @@ const TicketDashboard = ({route, navigation}) => {
             <Text style={styles.claimSubmissionBtnTxt}>Delete</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Claims', {})}>
           <View style={styles.claimSubmissionBtn}>
             <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
           </View>
