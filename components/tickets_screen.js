@@ -288,6 +288,13 @@ const TicketsScreen = ({navigation}) => {
         )}
       />
       <TouchableOpacity
+        style={[styles.fab, {bottom: 100}]}
+        onPress={() => {
+          navigation.navigate('TrainDepartureBoard');
+        }}>
+        <Text style={styles.textPlusSymbol}>-</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.fab}
         onPress={() => {
           toggleModalVisibility(!isModalVisible);
@@ -320,6 +327,8 @@ const TicketsScreen = ({navigation}) => {
         destStation={journeyTo}
         journeyDay={journeyDay}
         journeyTime={journeyTime}
+        ticketNumber={ticketNumber}
+        ticketPrice={ticketPrice}
       />
     </View>
   );
