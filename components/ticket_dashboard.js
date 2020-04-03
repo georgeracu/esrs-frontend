@@ -15,6 +15,9 @@ import moment from 'moment';
 import {stations} from '../utils/stations';
 import {useFocusEffect} from '@react-navigation/native';
 import AddJourneyModal from './add_journey_modal';
+import RNMlKit from 'react-native-firebase-mlkit';
+import ImagePicker from 'react-native-image-picker';
+
 const TicketDashboard = ({route, navigation}) => {
   const {
     id,
@@ -40,7 +43,9 @@ const TicketDashboard = ({route, navigation}) => {
   const [ticketPrice, setTicketPrice] = useState(price);
   const [nationalRailNumber, setNationalRailNumber] = useState(NRailNumber);
 
-  const [isModalVisible, toggleModalVisibility] = useState(false);
+  const [isAddJourneyModalVisible, toggleAddJourneyModalVisibility] = useState(
+    false,
+  );
 
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
@@ -134,7 +139,7 @@ const TicketDashboard = ({route, navigation}) => {
 
       delete newJourney.id;
 
-      toggleModalVisibility(false);
+      toggleAddJourneyModalVisibility(false);
 
       fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
         method: 'PUT',
@@ -175,7 +180,7 @@ const TicketDashboard = ({route, navigation}) => {
    * Cancel adding a journey
    */
   const cancelJourney = () => {
-    toggleModalVisibility(false);
+    toggleAddJourneyModalVisibility(false);
   };
 
   /**
@@ -239,7 +244,7 @@ const TicketDashboard = ({route, navigation}) => {
         </View>
         <TouchableOpacity
           onPress={() => {
-            toggleModalVisibility(!isModalVisible);
+            toggleAddJourneyModalVisibility(!isAddJourneyModalVisible);
           }}>
           <Image source={require('../resources/edit.png')} />
         </TouchableOpacity>
@@ -277,12 +282,12 @@ const TicketDashboard = ({route, navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity>
           <View style={styles.claimSubmissionBtn}>
-            <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
+            <Text style={styles.claimSubmissionBtnTxt}>Claim Refund</Text>
           </View>
         </TouchableOpacity>
       </View>
       <AddJourneyModal
-        visible={isModalVisible}
+        visible={isAddJourneyModalVisible}
         onCancel={cancelJourney}
         onAddJourney={updateJourney}
         onSearchStation={searchStation}
@@ -307,6 +312,8 @@ const TicketDashboard = ({route, navigation}) => {
         destStation={journeyTo}
         journeyDay={journeyDay}
         journeyTime={journeyTime}
+        ticketNumber={ticketNumber}
+        ticketPrice={ticketPrice}
       />
     </View>
   );

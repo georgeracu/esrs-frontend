@@ -53,12 +53,14 @@ const AddJourneyModal = props => {
           />
           <View style={styles.textInputContainer}>
             <TextInput
+              value={props.ticketNumber}
               style={styles.textInputBasic}
               placeholder="Ticket Number"
               onChangeText={text => props.onTicketNumberChange(text)}
             />
 
             <TextInput
+              value={props.ticketPrice}
               style={styles.textInputBasic}
               placeholder="Ticket Price"
               keyboardType={'numeric'}
