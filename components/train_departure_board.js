@@ -13,13 +13,7 @@ import {stations} from '../utils/stations';
 const TrainDepartureBoardScreen = ({navigation}) => {
   const [station, setStation] = useState('');
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
-  const [departures, updateDepartures] = useState([
-    {id: '0', departure: 'Falmer', destination: 'Brighton'},
-    {id: '1', departure: 'Manchester', destination: 'London Euston'},
-    {id: '2', departure: 'Picadilly', destination: 'Knutsford'},
-    {id: '3', departure: 'Bradford', destination: 'London Road'},
-    {id: '4', departure: 'Croydon', destination: 'Mouslecoomb'},
-  ]);
+  const [departures, updateDepartures] = useState([]);
 
   useEffect(() => {
     async function getLiveTrainUpdates() {}
@@ -49,12 +43,26 @@ const TrainDepartureBoardScreen = ({navigation}) => {
    */
   const fetchDepartures = async () => {
     if (station !== '') {
-      fetch(
-        `http://esrs.herokuapp.com/api/departures/${station.toLowerCase()}`,
-      ).then(async response => {
-        const json = await response.json();
-        console.log(json);
-      });
+      fetch(`http://esrs.herokuapp.com/api/departures/${station.toLowerCase()}`)
+        .then(response => response.json())
+        .then(json => {
+          let count = 0;
+          const departures = json.trainServices.map(departure => {
+            console.log(departure);
+            return {
+              id: `${++count}`,
+              depart: departure.origin[0].locationName,
+              dest: departure.destination[0].locationName,
+              std: departure.std,
+              etd: departure.etd,
+              platform: departure.platform,
+              operator: departure.operator,
+              cancelReason: departure.cancelReason,
+              delayReason: departure.delayReason,
+            };
+          });
+          updateDepartures(departures);
+        });
     }
   };
 
@@ -94,7 +102,6 @@ const TrainDepartureBoardScreen = ({navigation}) => {
       </View>
       <FlatList
         data={departures}
-        extraData={departure => departure}
         keyExtractor={departure => departure.id}
         contentContainerStyle={
           departures.length > 0 ? styles.emptyStateNull : styles.emptyState
@@ -105,9 +112,12 @@ const TrainDepartureBoardScreen = ({navigation}) => {
         renderItem={({item, index}) => (
           <View style={[styles.journeyView, item.style]}>
             <View style={styles.journeyDetails}>
-              <Text>{item.departure}</Text>
-              <Image source={require('../resources/arrow-circle-right.png')} />
-              <Text>{item.destination}</Text>
+              <Text>{item.depart}</Text>
+              <Text>{item.dest}</Text>
+              <Text>{item.platform}</Text>
+              <Text>{item.operator}</Text>
+              <Text>{item.cancelReason}</Text>
+              <Text>{item.delayReason}</Text>
             </View>
           </View>
         )}
