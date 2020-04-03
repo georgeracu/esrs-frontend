@@ -15,6 +15,9 @@ import moment from 'moment';
 import {stations} from '../utils/stations';
 import {useFocusEffect} from '@react-navigation/native';
 import AddJourneyModal from './add_journey_modal';
+import RNMlKit from 'react-native-firebase-mlkit';
+import ImagePicker from 'react-native-image-picker';
+
 const TicketDashboard = ({route, navigation}) => {
   const {
     id,
