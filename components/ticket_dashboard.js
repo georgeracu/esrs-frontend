@@ -17,6 +17,9 @@ import moment from 'moment';
 import {stations} from '../utils/stations';
 import {useFocusEffect} from '@react-navigation/native';
 import AddJourneyModal from './add_journey_modal';
+import RNMlKit from 'react-native-firebase-mlkit';
+import ImagePicker from 'react-native-image-picker';
+
 const TicketDashboard = ({route, navigation}) => {
   const {
     id,
@@ -41,6 +44,7 @@ const TicketDashboard = ({route, navigation}) => {
   const [ticketNumber, setTicketNumber] = useState(number);
   const [ticketPrice, setTicketPrice] = useState(price);
   const [nationalRailNumber, setNationalRailNumber] = useState(NRailNumber);
+
   const [isAddJourneyModalVisible, toggleAddJourneyModalVisibility] = useState(
     false,
   );
@@ -48,6 +52,7 @@ const TicketDashboard = ({route, navigation}) => {
     isTrainServiceModalVisible,
     toggleTrainServiceModalVisibility,
   ] = useState(false);
+
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
   const [journeys, setJourneys] = useState([]);
@@ -313,7 +318,7 @@ const TicketDashboard = ({route, navigation}) => {
         <TouchableOpacity
           onPress={() => toggleTrainServiceModalVisibility(true)}>
           <View style={styles.claimSubmissionBtn}>
-            <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
+            <Text style={styles.claimSubmissionBtnTxt}>Claim Refund</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -343,6 +348,8 @@ const TicketDashboard = ({route, navigation}) => {
         destStation={journeyTo}
         journeyDay={journeyDay}
         journeyTime={journeyTime}
+        ticketNumber={ticketNumber}
+        ticketPrice={ticketPrice}
       />
     </View>
   );

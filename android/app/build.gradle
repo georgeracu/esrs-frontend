@@ -145,7 +145,8 @@ android {
         }
     }
     signingConfigs {
-        def keysFilePath = file("C:/Users/atiqu/Documents/repayline_key.json").toString()
+        def keysFilePath = file("E:/ESRS/integrate/departure/repayline_key.json").toString()
+
         def keysFile = new File(keysFilePath, "").getText('UTF-8')
         def json = new groovy.json.JsonSlurper().parseText(keysFile)
         debug {
@@ -195,6 +196,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
+	implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
     implementation 'com.android.support:multidex:1.0.3'
 	implementation project(':react-native-camera-kit')
 

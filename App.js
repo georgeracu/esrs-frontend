@@ -20,6 +20,7 @@ import TicketDashboard from './components/ticket_dashboard';
 import ClaimsScreen from './components/claims_screen';
 import messaging from '@react-native-firebase/messaging';
 import CameraScreen from './components/camera_screen';
+import TrainDepartureBoard from './components/train_departure_board';
 
 function App() {
   useEffect(() => {
@@ -53,6 +54,10 @@ function App() {
         <Stack.Screen name="Tickets" component={TicketsScreen} />
         <Stack.Screen name="TicketDashboard" component={TicketDashboard} />
         <Stack.Screen name="Claims" component={ClaimsScreen} />
+        <Stack.Screen
+          name="TrainDepartureBoard"
+          component={TrainDepartureBoard}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

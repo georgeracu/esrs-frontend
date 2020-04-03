@@ -14,16 +14,18 @@ import moment from 'moment';
 import {sha256} from 'react-native-sha256';
 import {stations} from '../utils/stations';
 import AddJourneyModal from './add_journey_modal';
+import RNMlKit from 'react-native-firebase-mlkit';
+import ImagePicker from 'react-native-image-picker';
 
 const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
   const [journeyDay, setJourneyDay] = useState(
-    moment(new Date()).format('DD-MM-YYYY'),
+    'DD-MM-YYYY',
   );
   const [journeyTime, setJourneyTime] = useState(
-    moment(new Date()).format('HH:mm'),
+    'HH:mm',
   );
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
@@ -37,6 +39,8 @@ const TicketsScreen = ({navigation}) => {
   const [id, setId] = useState('');
 
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
+
+  const [ticketImage, setTicketImage] = useState({});
 
   useEffect(() => {
     async function getPersistedJourneys() {
@@ -54,6 +58,98 @@ const TicketsScreen = ({navigation}) => {
     }
     getPersistedJourneys();
   }, []);
+
+
+  /**
+   * Gets image from camera or gallery
+   */
+  const options = {
+    title: 'Get A Ticket Picture',
+  };
+
+  const getImage = async () => {
+    console.log("HEY: ", moment(new Date("1737")).format('HH:mm'))
+    ImagePicker.showImagePicker(options, async response => {
+      //console.log('Response = ', response);
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        //return false;
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        //return false;
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        //return false;
+      } else {
+        const source = { uri: response.uri, data: response.data, name: response.fileName };
+        setTicketImage(source);
+        const deviceTextRecognition = await RNMlKit.deviceTextRecognition(response.uri); 
+        console.log("HELLO");
+        console.log('Text Recognition On-Device', deviceTextRecognition[4].resultText);
+        console.log("HELLO", deviceTextRecognition.length);
+
+        for(let i = 0; i < deviceTextRecognition.length; i++) {
+          const array = deviceTextRecognition[i].resultText.split("\n");
+          for (var x in array) {
+            console.log(array[x])
+
+            var str = array[x]
+
+            var pattern = new RegExp("^[0-9-]*$");
+            var res = pattern.test(str);
+            if(res) {
+              setTicketNumber(String(array[x]));
+            }
+
+            let day = new Date(String(array[x]));
+            if(JSON.stringify(day) != "null") {
+              let daytime = moment(new Date(day)).format('DD-MM-YYYY');
+              setJourneyDay(daytime);
+            }
+
+            var pattern = new RegExp("^[0-9]*:");
+            var res = pattern.test(str);
+            if(res) {
+              let time = String(array[x]);
+              time = time.split(":")[0];
+              time = time.slice(0, 2) + ":" + time.slice(2);
+              setJourneyTime(time);
+            }
+
+            var pattern = new RegExp("£+");
+            var res = pattern.test(str);
+            if(res) {
+              let price = String(array[x]);
+              price = price.split("£")[1];
+              price = price.split("X")[0];
+              price = price.trim();
+              price = price.replace(" ", ".");
+              //price = price.split("£")[1].split("X")[0].trim().replace(" ", ".");
+              setTicketPrice(price);
+            }
+
+            if(str.split(" ")[0] == "to" || str.split(" ")[0] == "from") {
+              for(let i = 0; i < stations.names.length; i++) {
+                var key = stations.names[i]
+                const regex = /^\w+( \w+| \&+)*/g;
+                const found = key.match(regex);
+                var from = array[x].substring(5);
+                var to = array[x].substring(3);
+                if(String(found[0]) == String(from)) {
+                  console.log(stations.codes[i]);
+                  setJourneyFrom(String(stations.codes[i]));
+                }
+                if(String(found[0]) == String(to)) {
+                  console.log(stations.codes[i]);
+                  setJourneyTo(String(stations.codes[i]));
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
   /**
    * Returns matching stations
@@ -100,8 +196,8 @@ const TicketsScreen = ({navigation}) => {
       setJourneyTo('');
       setTicketNumber('');
       setTicketPrice('');
-      setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
-      setJourneyTime(moment(new Date()).format('HH:mm'));
+      setJourneyDay('DD-MM-YYYY');
+      setJourneyTime('HH:mm');
 
       toggleModalVisibility(false);
 
@@ -288,6 +384,18 @@ const TicketsScreen = ({navigation}) => {
         )}
       />
       <TouchableOpacity
+        style={[styles.fab, {bottom: 200}]}
+        onPress={() => getImage()}>
+        <Text style={styles.textPlusSymbol}>A</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.fab, {bottom: 100}]}
+        onPress={() => {
+          navigation.navigate('TrainDepartureBoard');
+        }}>
+        <Text style={styles.textPlusSymbol}>-</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.fab}
         onPress={() => {
           toggleModalVisibility(!isModalVisible);
@@ -320,6 +428,8 @@ const TicketsScreen = ({navigation}) => {
         destStation={journeyTo}
         journeyDay={journeyDay}
         journeyTime={journeyTime}
+        ticketNumber={ticketNumber}
+        ticketPrice={ticketPrice}
       />
     </View>
   );
