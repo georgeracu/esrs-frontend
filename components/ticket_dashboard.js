@@ -298,6 +298,7 @@ const TicketDashboard = ({route, navigation}) => {
         journeyTime={journeyTime}
         ticketNumber={ticketNumber}
         ticketPrice={ticketPrice}
+        positiveButtonName="Edit Journey"
       />
     </View>
   );

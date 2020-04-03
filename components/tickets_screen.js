@@ -436,6 +436,7 @@ const TicketsScreen = ({navigation}) => {
         journeyTime={journeyTime}
         ticketNumber={ticketNumber}
         ticketPrice={ticketPrice}
+        positiveButtonName="Add Journey"
       />
     </View>
   );

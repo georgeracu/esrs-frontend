@@ -77,7 +77,9 @@ const AddJourneyModal = props => {
             <TouchableOpacity
               style={styles.modalButtonRight}
               onPress={() => props.onAddJourney()}>
-              <Text style={styles.textModalButton}>Add Journey</Text>
+              <Text style={styles.textModalButton}>
+                {props.positiveButtonName}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
