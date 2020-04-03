@@ -24,9 +24,9 @@ const CameraScreen = ({navigation}) => {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
         {
-          title: 'RepayLine Camera Permission',
+          title: 'Train Wallet Camera Permission',
           message:
-            'RepayLine needs access to your camera ' +
+            'Train Wallet needs access to your camera ' +
             'so you can take awesome pictures.',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
@@ -52,9 +52,9 @@ const CameraScreen = ({navigation}) => {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         {
-          title: 'RepayLine Storage Permission',
+          title: 'Train Wallet Storage Permission',
           message:
-            'RepayLine needs access to your storage ' +
+            'Train Wallet needs access to your storage ' +
             'so you can take awesome pictures.',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
@@ -78,7 +78,7 @@ const CameraScreen = ({navigation}) => {
 
   return (
     <View style={styles.root}>
-      <Text style={styles.appName}>REPAYLINE CAMERA</Text>
+      <Text style={styles.appName}>Train Wallet CAMERA</Text>
       {getPermission() ? (
         <CameraKitCamera
           ref={cameraRef}
@@ -121,6 +121,6 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    
+
   },
 });

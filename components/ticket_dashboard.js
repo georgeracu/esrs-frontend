@@ -21,17 +21,7 @@ import RNMlKit from 'react-native-firebase-mlkit';
 import ImagePicker from 'react-native-image-picker';
 
 const TicketDashboard = ({route, navigation}) => {
-  const {
-    id,
-    from,
-    to,
-    dateTime,
-    medium,
-    type,
-    price,
-    number,
-    NRailNumber,
-  } = route.params;
+  const {id, from, to, dateTime, price, number} = route.params;
 
   const [journeyFrom, setJourneyFrom] = useState(from);
   const [journeyTo, setJourneyTo] = useState(to);
@@ -39,11 +29,8 @@ const TicketDashboard = ({route, navigation}) => {
   const [journeyTime, setJourneyTime] = useState(dateTime.split(' ')[1]);
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
-  const [journeyMedium, setJourneyMedium] = useState(medium);
-  const [ticketType, setTicketType] = useState(type);
   const [ticketNumber, setTicketNumber] = useState(number);
   const [ticketPrice, setTicketPrice] = useState(price);
-  const [nationalRailNumber, setNationalRailNumber] = useState(NRailNumber);
 
   const [isAddJourneyModalVisible, toggleAddJourneyModalVisibility] = useState(
     false,
@@ -123,21 +110,15 @@ const TicketDashboard = ({route, navigation}) => {
       setJourneyTo(journeyTo);
       setJourneyDay(journeyDay);
       setJourneyTime(journeyTime);
-      setJourneyMedium(journeyMedium);
-      setTicketType(ticketType);
       setTicketPrice(ticketPrice);
       setTicketNumber(ticketNumber);
-      setNationalRailNumber(nationalRailNumber);
 
       const newJourney = {
         journey_from: journeyFrom,
         journey_to: journeyTo,
         journey_datetime: `${journeyDay} ${journeyTime}`,
-        journey_medium: journeyMedium,
-        ticket_type: ticketType,
         ticket_price: ticketPrice,
         ticket_number: ticketNumber,
-        national_rail_number: nationalRailNumber,
       };
 
       const newJourneys = journeys.map(journey => {
@@ -192,6 +173,13 @@ const TicketDashboard = ({route, navigation}) => {
    * Cancel adding a journey
    */
   const cancelJourney = () => {
+    setJourneyFrom(from);
+    setJourneyTo(to);
+    setJourneyDay(dateTime.split(' ')[0]);
+    setJourneyTime(dateTime.split(' ')[1]);
+    setTicketPrice(price);
+    setTicketNumber(number);
+    setStationsSuggestions([]);
     toggleAddJourneyModalVisibility(false);
   };
 
@@ -245,10 +233,6 @@ const TicketDashboard = ({route, navigation}) => {
         <Image source={require('../resources/ticket-white.png')} />
         <View style={styles.darkContainerTxts}>
           <Text style={styles.darkContainerTxtBold}>{ticketNumber}</Text>
-          <Text
-            style={[styles.darkContainerTxtBold, styles.darkContainerTxtLight]}>
-            {ticketType}
-          </Text>
           <Text
             style={[styles.darkContainerTxtBold, styles.darkContainerTxtLight]}>
             £{ticketPrice}
@@ -350,6 +334,7 @@ const TicketDashboard = ({route, navigation}) => {
         journeyTime={journeyTime}
         ticketNumber={ticketNumber}
         ticketPrice={ticketPrice}
+        positiveButtonName="Edit Journey"
       />
     </View>
   );

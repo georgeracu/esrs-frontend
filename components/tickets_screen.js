@@ -21,12 +21,8 @@ const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
   const [journeyFrom, setJourneyFrom] = useState('');
   const [journeyTo, setJourneyTo] = useState('');
-  const [journeyDay, setJourneyDay] = useState(
-    'DD-MM-YYYY',
-  );
-  const [journeyTime, setJourneyTime] = useState(
-    'HH:mm',
-  );
+  const [journeyDay, setJourneyDay] = useState('DD-MM-YYYY');
+  const [journeyTime, setJourneyTime] = useState('HH:mm');
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
   const [ticketNumber, setTicketNumber] = useState('');
@@ -48,6 +44,7 @@ const TicketsScreen = ({navigation}) => {
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
+        console.log(parsedJourneysJson);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
           journey.isSelected = false;
           journey.style = styles.journeyView;
@@ -59,7 +56,6 @@ const TicketsScreen = ({navigation}) => {
     getPersistedJourneys();
   }, []);
 
-
   /**
    * Gets image from camera or gallery
    */
@@ -68,7 +64,7 @@ const TicketsScreen = ({navigation}) => {
   };
 
   const getImage = async () => {
-    console.log("HEY: ", moment(new Date("1737")).format('HH:mm'))
+    console.log('HEY: ', moment(new Date('1737')).format('HH:mm'));
     ImagePicker.showImagePicker(options, async response => {
       //console.log('Response = ', response);
       if (response.didCancel) {
@@ -81,65 +77,74 @@ const TicketsScreen = ({navigation}) => {
         console.log('User tapped custom button: ', response.customButton);
         //return false;
       } else {
-        const source = { uri: response.uri, data: response.data, name: response.fileName };
+        const source = {
+          uri: response.uri,
+          data: response.data,
+          name: response.fileName,
+        };
         setTicketImage(source);
-        const deviceTextRecognition = await RNMlKit.deviceTextRecognition(response.uri); 
-        console.log("HELLO");
-        console.log('Text Recognition On-Device', deviceTextRecognition[4].resultText);
-        console.log("HELLO", deviceTextRecognition.length);
+        const deviceTextRecognition = await RNMlKit.deviceTextRecognition(
+          response.uri,
+        );
+        console.log('HELLO');
+        console.log(
+          'Text Recognition On-Device',
+          deviceTextRecognition[4].resultText,
+        );
+        console.log('HELLO', deviceTextRecognition.length);
 
-        for(let i = 0; i < deviceTextRecognition.length; i++) {
-          const array = deviceTextRecognition[i].resultText.split("\n");
+        for (let i = 0; i < deviceTextRecognition.length; i++) {
+          const array = deviceTextRecognition[i].resultText.split('\n');
           for (var x in array) {
-            console.log(array[x])
+            console.log(array[x]);
 
-            var str = array[x]
+            var str = array[x];
 
-            var pattern = new RegExp("^[0-9-]*$");
+            var pattern = new RegExp('^[0-9-]*$');
             var res = pattern.test(str);
-            if(res) {
+            if (res) {
               setTicketNumber(String(array[x]));
             }
 
             let day = new Date(String(array[x]));
-            if(JSON.stringify(day) != "null") {
+            if (JSON.stringify(day) != 'null') {
               let daytime = moment(new Date(day)).format('DD-MM-YYYY');
               setJourneyDay(daytime);
             }
 
-            var pattern = new RegExp("^[0-9]*:");
+            var pattern = new RegExp('^[0-9]*:');
             var res = pattern.test(str);
-            if(res) {
+            if (res) {
               let time = String(array[x]);
-              time = time.split(":")[0];
-              time = time.slice(0, 2) + ":" + time.slice(2);
+              time = time.split(':')[0];
+              time = time.slice(0, 2) + ':' + time.slice(2);
               setJourneyTime(time);
             }
 
-            var pattern = new RegExp("£+");
+            var pattern = new RegExp('£+');
             var res = pattern.test(str);
-            if(res) {
+            if (res) {
               let price = String(array[x]);
-              price = price.split("£")[1];
-              price = price.split("X")[0];
+              price = price.split('£')[1];
+              price = price.split('X')[0];
               price = price.trim();
-              price = price.replace(" ", ".");
+              price = price.replace(' ', '.');
               //price = price.split("£")[1].split("X")[0].trim().replace(" ", ".");
               setTicketPrice(price);
             }
 
-            if(str.split(" ")[0] == "to" || str.split(" ")[0] == "from") {
-              for(let i = 0; i < stations.names.length; i++) {
-                var key = stations.names[i]
+            if (str.split(' ')[0] == 'to' || str.split(' ')[0] == 'from') {
+              for (let i = 0; i < stations.names.length; i++) {
+                var key = stations.names[i];
                 const regex = /^\w+( \w+| \&+)*/g;
                 const found = key.match(regex);
                 var from = array[x].substring(5);
                 var to = array[x].substring(3);
-                if(String(found[0]) == String(from)) {
+                if (String(found[0]) == String(from)) {
                   console.log(stations.codes[i]);
                   setJourneyFrom(String(stations.codes[i]));
                 }
-                if(String(found[0]) == String(to)) {
+                if (String(found[0]) == String(to)) {
                   console.log(stations.codes[i]);
                   setJourneyTo(String(stations.codes[i]));
                 }
@@ -149,7 +154,7 @@ const TicketsScreen = ({navigation}) => {
         }
       }
     });
-  }
+  };
 
   /**
    * Returns matching stations
@@ -173,7 +178,6 @@ const TicketsScreen = ({navigation}) => {
    * Adds a new journey
    */
   const addJourney = async () => {
-    console.log(`${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`);
     const isValid = validateJourney();
     if (isValid) {
       const journeyDetails = `${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`;
@@ -187,9 +191,6 @@ const TicketsScreen = ({navigation}) => {
         ticket_number: ticketNumber,
       };
       setJourneys([...journeys, journey]);
-      delete journey.isSelected;
-      delete journey.style;
-      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
       // Clear inputs
       setJourneyFrom('');
@@ -198,6 +199,11 @@ const TicketsScreen = ({navigation}) => {
       setTicketPrice('');
       setJourneyDay('DD-MM-YYYY');
       setJourneyTime('HH:mm');
+
+      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
+
+      delete journey.isSelected;
+      delete journey.style;
 
       toggleModalVisibility(false);
 
@@ -393,7 +399,7 @@ const TicketsScreen = ({navigation}) => {
         onPress={() => {
           navigation.navigate('TrainDepartureBoard');
         }}>
-        <Text style={styles.textPlusSymbol}>-</Text>
+        <Image source={require('../resources/train.png')} />
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.fab}
@@ -430,6 +436,7 @@ const TicketsScreen = ({navigation}) => {
         journeyTime={journeyTime}
         ticketNumber={ticketNumber}
         ticketPrice={ticketPrice}
+        positiveButtonName="Add Journey"
       />
     </View>
   );
