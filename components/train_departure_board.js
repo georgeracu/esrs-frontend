@@ -53,7 +53,7 @@ const TrainDepartureBoardScreen = ({navigation}) => {
         `http://esrs.herokuapp.com/api/departures/${station.toLowerCase()}`,
       ).then(async response => {
         const json = await response.json();
-        console.log(json);
+        console.log("Coming from", json.trainServices[0].origin[0].locationName, "going to", json.trainServices[0].destination[0].locationName);
       });
     }
   };
