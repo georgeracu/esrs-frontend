@@ -105,7 +105,7 @@ const RegisterScreen = ({navigation}) => {
 
     return (
         <View style={styles.root}>
-                <Text style={styles.appName}>REPAYLINE</Text>
+                <Text style={styles.appName}>Train Wallet</Text>
                 <View style={styles.scrollViewContents}>
                     <Text style={styles.welcomeMessageFirstLine}>Welcome,</Text>
                     <Text style={styles.welcomeMessage}>sign up and reclaim</Text>

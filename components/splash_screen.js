@@ -45,7 +45,7 @@ const SplashScreen = ({navigation}) => {
 
   return (
     <View style={styles.root}>
-      <Text style={styles.appName}>REPAYLINE</Text>
+      <Text style={styles.appName}>Train Wallet</Text>
     </View>
   );
 };
