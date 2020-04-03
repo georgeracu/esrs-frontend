@@ -1,15 +1,27 @@
-import React from 'react';
+import React, {useState} from 'react';
+
 import {View, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {WebView} from 'react-native-webview';
 
-const ClaimsScreen = ({navigation}) => {
+const ClaimsScreen = ({route, navigation}) => {
+  const {service} = route.params;
+  let serviceUri = '';
+  switch (service) {
+    case 'Southern Rail':
+      serviceUri = 'https://delayrepay.southernrailway.com/customer-details';
+      break;
+    case 'Great Western Rail':
+      serviceUri = 'https://delayrepay.gwr.com/make-claim';
+      break;
+    case 'Thameslink':
+      serviceUri = 'https://delayrepay.thameslinkrailway.com/customer-details';
+      break;
+  }
   return (
     <View style={styles.container}>
       <WebView
         source={{
-          uri:
-            //need address for claims form
-            'https://delayrepay.gwr.com/make-claim',
+          uri: serviceUri,
         }}
       />
       <TouchableOpacity onPress={() => navigation.navigate('Tickets', {})}>

@@ -8,6 +8,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  FlatList,
 } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -39,12 +41,22 @@ const TicketDashboard = ({route, navigation}) => {
   const [ticketNumber, setTicketNumber] = useState(number);
   const [ticketPrice, setTicketPrice] = useState(price);
   const [nationalRailNumber, setNationalRailNumber] = useState(NRailNumber);
-
-  const [isModalVisible, toggleModalVisibility] = useState(false);
-
+  const [isAddJourneyModalVisible, toggleAddJourneyModalVisibility] = useState(
+    false,
+  );
+  const [
+    isTrainServiceModalVisible,
+    toggleTrainServiceModalVisibility,
+  ] = useState(false);
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
   const [journeys, setJourneys] = useState([]);
+
+  const [trainServices] = useState([
+    {name: 'Southern Rail'},
+    {name: 'Great Western Rail'},
+    {name: 'Thameslink'},
+  ]);
 
   useEffect(() => {
     async function getPersistedJourneys() {
@@ -134,7 +146,7 @@ const TicketDashboard = ({route, navigation}) => {
 
       delete newJourney.id;
 
-      toggleModalVisibility(false);
+      toggleAddJourneyModalVisibility(false);
 
       fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
         method: 'PUT',
@@ -175,7 +187,7 @@ const TicketDashboard = ({route, navigation}) => {
    * Cancel adding a journey
    */
   const cancelJourney = () => {
-    toggleModalVisibility(false);
+    toggleAddJourneyModalVisibility(false);
   };
 
   /**
@@ -239,7 +251,7 @@ const TicketDashboard = ({route, navigation}) => {
         </View>
         <TouchableOpacity
           onPress={() => {
-            toggleModalVisibility(!isModalVisible);
+            toggleAddJourneyModalVisibility(!isAddJourneyModalVisible);
           }}>
           <Image source={require('../resources/edit.png')} />
         </TouchableOpacity>
@@ -275,14 +287,38 @@ const TicketDashboard = ({route, navigation}) => {
             <Text style={styles.claimSubmissionBtnTxt}>Delete</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Claims', {})}>
+        <Modal visible={isTrainServiceModalVisible} animationType={'slide'}>
+          <View>
+            <FlatList
+              data={trainServices}
+              keyExtractor={trainService => trainService.name}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('Claims', {service: item.name});
+                    toggleTrainServiceModalVisibility(false);
+                  }}>
+                  <Text>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => toggleTrainServiceModalVisibility(false)}>
+              <View style={styles.claimSubmissionBtn}>
+                <Text style={styles.claimSubmissionBtnTxt}>CANCEL</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+        <TouchableOpacity
+          onPress={() => toggleTrainServiceModalVisibility(true)}>
           <View style={styles.claimSubmissionBtn}>
             <Text style={styles.claimSubmissionBtnTxt}>Submit claim</Text>
           </View>
         </TouchableOpacity>
       </View>
       <AddJourneyModal
-        visible={isModalVisible}
+        visible={isAddJourneyModalVisible}
         onCancel={cancelJourney}
         onAddJourney={updateJourney}
         onSearchStation={searchStation}
