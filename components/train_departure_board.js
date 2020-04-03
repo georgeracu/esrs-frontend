@@ -16,24 +16,18 @@ const TrainDepartureBoardScreen = ({navigation}) => {
   const [departures, updateDepartures] = useState([]);
   const [isRefreshing, toggleIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function getLiveTrainUpdates() {}
-    getLiveTrainUpdates();
-  }, []);
-
   /**
    * Returns matching stations
    * @param stationName
    */
   const searchStation = stationName => {
     setStation(stationName);
-    const results = stations.names.filter(station => {
-      return station.toLowerCase().startsWith(stationName.toLowerCase());
-    });
     if (stationName === '') {
       setStationsSuggestions([]);
     } else {
-      console.log(stationName);
+      const results = stations.names.filter(station => {
+        return station.toLowerCase().startsWith(stationName.toLowerCase());
+      });
       setStationsSuggestions(results.slice(0, 5));
     }
   };
@@ -43,14 +37,13 @@ const TrainDepartureBoardScreen = ({navigation}) => {
    * @returns {Promise<void>}
    */
   const fetchDepartures = async () => {
-    toggleIsRefreshing(true);
     if (station !== '') {
+      toggleIsRefreshing(true);
       fetch(`http://esrs.herokuapp.com/api/departures/${station.toLowerCase()}`)
         .then(response => response.json())
         .then(json => {
           let count = 0;
           const departures = json.trainServices.map(departure => {
-            console.log(departure);
             return {
               id: `${++count}`,
               departName: departure.origin[0].locationName,
@@ -67,6 +60,9 @@ const TrainDepartureBoardScreen = ({navigation}) => {
           });
           toggleIsRefreshing(false);
           updateDepartures(departures);
+        })
+        .catch(() => {
+          toggleIsRefreshing(false);
         });
     }
   };
@@ -97,21 +93,22 @@ const TrainDepartureBoardScreen = ({navigation}) => {
           style={styles.searchIcon}>
           <Image source={require('../resources/search.png')} />
         </TouchableOpacity>
-        <FlatList
-          data={stationsSuggestions}
-          keyExtractor={station => station}
-          showsHorizontalScrollIndicator={true}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              onPress={() => {
-                setStation(stations.stationsAndCodes.get(station));
-                setStationsSuggestions([]);
-              }}>
-              <Text style={styles.listItem}>{item}</Text>
-            </TouchableOpacity>
-          )}
-        />
       </View>
+      <FlatList
+        data={stationsSuggestions}
+        keyExtractor={station => station}
+        showsHorizontalScrollIndicator={true}
+        contentContainerStyle={styles.stationsList}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            onPress={() => {
+              setStation(stations.stationsAndCodes.get(item));
+              setStationsSuggestions([]);
+            }}>
+            <Text style={styles.listItem}>{item}</Text>
+          </TouchableOpacity>
+        )}
+      />
       <FlatList
         data={departures}
         keyExtractor={departure => departure.id}
@@ -285,5 +282,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 11,
     color: '#687DFC',
+  },
+  stationsList: {
+    backgroundColor: '#FFFFFF',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    marginTop: 10,
   },
 });

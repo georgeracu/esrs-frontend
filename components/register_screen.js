@@ -12,6 +12,7 @@ import validator from 'validator';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-community/async-storage';
 import {sha256} from 'react-native-sha256';
+import generateFCMToken from '../utils/fcm';
 
 const RegisterScreen = ({navigation}) => {
 
@@ -50,12 +51,40 @@ const RegisterScreen = ({navigation}) => {
                 await AsyncStorage.setItem('id', credentials.user.uid);
                 await AsyncStorage.setItem('email', email);
                 await AsyncStorage.setItem('password', hash);
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'UserCredentials'}],
+
+                const userCredentials = {
+                    'user_id': credentials.user.uid,
+                    'email': email,
+                    'title': '',
+                    'first_name': '',
+                    'last_name': '',
+                    'phone': '',
+                    'country': '',
+                    'address': '',
+                    'town_city': '',
+                    'postcode': '',
+                };
+
+                const response = await fetch('http://esrs.herokuapp.com/api/auth/user', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userCredentials),
                 });
-                toggleSignUpBtnTxt('Sign me up');
-                toggleSignUpState(false);
+
+                if (response.status === 201) {
+                    await generateFCMToken(credentials.user.uid);
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'Tickets'}],
+                    });
+                } else {
+                    toggleSignUpBtnTxt('Sign me up');
+                    toggleSignUpState(false);
+                }
+
             })
             .catch(error => {
                 console.log(error);

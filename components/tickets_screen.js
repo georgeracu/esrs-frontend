@@ -44,6 +44,7 @@ const TicketsScreen = ({navigation}) => {
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
+        console.log(parsedJourneysJson);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
           journey.isSelected = false;
           journey.style = styles.journeyView;
@@ -177,7 +178,6 @@ const TicketsScreen = ({navigation}) => {
    * Adds a new journey
    */
   const addJourney = async () => {
-    console.log(`${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`);
     const isValid = validateJourney();
     if (isValid) {
       const journeyDetails = `${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`;
@@ -191,9 +191,6 @@ const TicketsScreen = ({navigation}) => {
         ticket_number: ticketNumber,
       };
       setJourneys([...journeys, journey]);
-      delete journey.isSelected;
-      delete journey.style;
-      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
       // Clear inputs
       setJourneyFrom('');
@@ -202,6 +199,11 @@ const TicketsScreen = ({navigation}) => {
       setTicketPrice('');
       setJourneyDay('DD-MM-YYYY');
       setJourneyTime('HH:mm');
+
+      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
+
+      delete journey.isSelected;
+      delete journey.style;
 
       toggleModalVisibility(false);
 

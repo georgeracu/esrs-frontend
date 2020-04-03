@@ -98,11 +98,11 @@ const AddJourneyModal = props => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
-                props.onSetJourneyDay();
+                props.onSetJourneyDay(newDate);
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
-                props.onSetJourneyTime();
+                props.onSetJourneyTime(newDate);
               }
             }
           }}
