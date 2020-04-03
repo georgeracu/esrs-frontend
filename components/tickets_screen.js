@@ -83,7 +83,7 @@ const TicketsScreen = ({navigation}) => {
       } else {
         const source = { uri: response.uri, data: response.data, name: response.fileName };
         setTicketImage(source);
-        const deviceTextRecognition = await RNMlKit.deviceTextRecognition(response.uri); 
+        const deviceTextRecognition = await RNMlKit.deviceTextRecognition(response.uri);
         console.log("HELLO");
         console.log('Text Recognition On-Device', deviceTextRecognition[4].resultText);
         console.log("HELLO", deviceTextRecognition.length);

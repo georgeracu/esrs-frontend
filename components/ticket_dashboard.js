@@ -235,10 +235,6 @@ const TicketDashboard = ({route, navigation}) => {
           <Text style={styles.darkContainerTxtBold}>{ticketNumber}</Text>
           <Text
             style={[styles.darkContainerTxtBold, styles.darkContainerTxtLight]}>
-            {ticketType}
-          </Text>
-          <Text
-            style={[styles.darkContainerTxtBold, styles.darkContainerTxtLight]}>
             £{ticketPrice}
           </Text>
         </View>
