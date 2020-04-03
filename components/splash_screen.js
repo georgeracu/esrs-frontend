@@ -29,20 +29,10 @@ const SplashScreen = ({navigation}) => {
       auth()
         .signInWithEmailAndPassword(email, password)
         .then(async () => {
-          const isSignUpComplete = await AsyncStorage.getItem(
-            'isSignUpComplete',
-          );
-          if (isSignUpComplete) {
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Tickets'}],
-            });
-          } else {
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'UserCredentials'}],
-            });
-          }
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Tickets'}],
+          });
         })
         .catch(err => {
           navigation.reset({
@@ -55,7 +45,7 @@ const SplashScreen = ({navigation}) => {
 
   return (
     <View style={styles.root}>
-      <Text style={styles.appName}>REPAYLINE</Text>
+      <Text style={styles.appName}>Train Wallet</Text>
     </View>
   );
 };
