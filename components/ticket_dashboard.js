@@ -8,9 +8,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Modal,
   FlatList,
+  Dimensions,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
@@ -53,8 +54,14 @@ const TicketDashboard = ({route, navigation}) => {
   const [journeys, setJourneys] = useState([]);
 
   const [trainServices] = useState([
+    {name: 'Avanti West Coast'},
+    {name: 'C2C'},
+    {name: 'East Midlands Railway'},
+    {name: ' Gatwick Express'},
     {name: 'Southern Rail'},
+    {name: 'Greater Anglia'},
     {name: 'Great Western Rail'},
+    {name: 'Northern'},
     {name: 'Thameslink'},
   ]);
 
@@ -287,24 +294,30 @@ const TicketDashboard = ({route, navigation}) => {
             <Text style={styles.claimSubmissionBtnTxt}>Delete</Text>
           </View>
         </TouchableOpacity>
-        <Modal visible={isTrainServiceModalVisible} animationType={'slide'}>
-          <View>
-            <FlatList
-              data={trainServices}
-              keyExtractor={trainService => trainService.name}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('Claims', {service: item.name});
-                    toggleTrainServiceModalVisibility(false);
-                  }}>
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              )}
-            />
+        <Modal
+          isVisible={isTrainServiceModalVisible}
+          animationType={'slide'}
+          backdropOpacity={0.5}>
+          <View style={styles.trainServiceModal}>
+            <View style={styles.smallModalView}>
+              <FlatList
+                data={trainServices}
+                keyExtractor={trainService => trainService.name}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('Claims', {service: item.name});
+                      toggleTrainServiceModalVisibility(false);
+                    }}>
+                    <Text style={styles.trainServicesBtnTxt}>{item.name}</Text>
+                    <View style={styles.trainServiceSeparatorLine} />
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
             <TouchableOpacity
               onPress={() => toggleTrainServiceModalVisibility(false)}>
-              <View style={styles.claimSubmissionBtn}>
+              <View style={styles.cancelSubmissionBtn}>
                 <Text style={styles.claimSubmissionBtnTxt}>CANCEL</Text>
               </View>
             </TouchableOpacity>
@@ -429,5 +442,40 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     fontFamily: 'sans-serif-medium',
+  },
+  trainServiceModal: {
+    height: Dimensions.get('window').height / 3,
+    width: '100%',
+    backgroundColor: 'rgb(245,245,245)',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  trainServicesBtnTxt: {
+    color: 'black',
+    marginBottom: 4,
+    fontSize: 16,
+    // fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  trainServiceSeparatorLine: {
+    width: '100%',
+    height: StyleSheet.hairlineWidth,
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'rgb(185,185,185)',
+  },
+  smallModalView: {
+    width: '100%',
+    height: Dimensions.get('window').height / 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelSubmissionBtn: {
+    backgroundColor: '#5C5FC9',
+    borderRadius: 10,
+    padding: 10,
+    width: 150,
+    bottom: 0,
+    marginTop: 15,
   },
 });
