@@ -45,13 +45,14 @@ const ClaimsScreen = ({route, navigation}) => {
           uri: serviceUri,
         }}
       />
-      <View style={styles.ticketButtonsContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('TicketDashboard', {})}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('TicketDashboard', {})}>
+        <View style={styles.ticketButtonsContainer}>
           <Text style={styles.returnToDashboardBtnTxt}>
             RETURN TO DASHBOARD
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
