@@ -227,7 +227,8 @@ const TicketsScreen = ({navigation}) => {
       !stations.codes.includes(journeyFrom) ||
       !stations.codes.includes(journeyTo) ||
       ticketNumber === '' ||
-      ticketPrice === ''
+      ticketPrice === '' ||
+      (journeyDay === 'DD-MM-YYYY' && journeyTime === 'HH:mm')
     ) {
       Alert.alert('Add Journey', 'Oops, looks like you are missing something');
       isValid = false;
