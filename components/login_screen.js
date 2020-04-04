@@ -98,7 +98,7 @@ const LoginScreen = ({navigation}) => {
 
     return (
         <View style={styles.root}>
-            <Text style={styles.appName}>REPAYLINE</Text>
+            <Text style={styles.appName}>Train Wallet</Text>
             <View>
                 <Text style={styles.welcomeMessageFirstLine}>Hi there</Text>
                 <Text style={styles.welcomeMessage}>please login</Text>

@@ -53,12 +53,14 @@ const AddJourneyModal = props => {
           />
           <View style={styles.textInputContainer}>
             <TextInput
+              value={props.ticketNumber}
               style={styles.textInputBasic}
               placeholder="Ticket Number"
               onChangeText={text => props.onTicketNumberChange(text)}
             />
 
             <TextInput
+              value={props.ticketPrice}
               style={styles.textInputBasic}
               placeholder="Ticket Price"
               keyboardType={'numeric'}
@@ -75,7 +77,9 @@ const AddJourneyModal = props => {
             <TouchableOpacity
               style={styles.modalButtonRight}
               onPress={() => props.onAddJourney()}>
-              <Text style={styles.textModalButton}>Add Journey</Text>
+              <Text style={styles.textModalButton}>
+                {props.positiveButtonName}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -96,11 +100,11 @@ const AddJourneyModal = props => {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('time');
                 toggleShowDateTime(true);
-                props.onSetJourneyDay();
+                props.onSetJourneyDay(newDate);
               } else if (dateTimeMode === 'time') {
                 toggleShowDateTime(false);
                 toggleDateTimeMode('date');
-                props.onSetJourneyTime();
+                props.onSetJourneyTime(newDate);
               }
             }
           }}
