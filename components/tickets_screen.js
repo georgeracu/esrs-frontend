@@ -44,7 +44,6 @@ const TicketsScreen = ({navigation}) => {
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
-        console.log(parsedJourneysJson);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
           journey.isSelected = false;
           journey.style = styles.journeyView;
