@@ -49,7 +49,7 @@ const TicketDashboard = ({route, navigation}) => {
     {name: 'Avanti West Coast'},
     {name: 'C2C'},
     {name: 'East Midlands Railway'},
-    {name: ' Gatwick Express'},
+    {name: 'Gatwick Express'},
     {name: 'Southern Rail'},
     {name: 'Greater Anglia'},
     {name: 'Great Western Rail'},
@@ -162,7 +162,8 @@ const TicketDashboard = ({route, navigation}) => {
       !stations.codes.includes(journeyFrom) ||
       !stations.codes.includes(journeyTo) ||
       ticketNumber === '' ||
-      ticketPrice === ''
+      ticketPrice === '' ||
+      (journeyDay === '' && journeyTime === '')
     ) {
       Alert.alert('Add Journey', 'Oops, looks like you are missing something');
       isValid = false;
@@ -288,22 +289,22 @@ const TicketDashboard = ({route, navigation}) => {
           animationType={'slide'}
           backdropOpacity={0.5}>
           <View style={styles.trainServiceModal}>
-            <View style={styles.smallModalView}>
-              <FlatList
-                data={trainServices}
-                keyExtractor={trainService => trainService.name}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('Claims', {service: item.name});
-                      toggleTrainServiceModalVisibility(false);
-                    }}>
+            <FlatList
+              data={trainServices}
+              keyExtractor={trainService => trainService.name}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('Claims', {service: item.name});
+                    toggleTrainServiceModalVisibility(false);
+                  }}>
+                  <View>
                     <Text style={styles.trainServicesBtnTxt}>{item.name}</Text>
                     <View style={styles.trainServiceSeparatorLine} />
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
             <TouchableOpacity
               onPress={() => toggleTrainServiceModalVisibility(false)}>
               <View style={styles.cancelSubmissionBtn}>
@@ -436,38 +437,23 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif-medium',
   },
   trainServiceModal: {
-    height: Dimensions.get('window').height / 3,
-    width: '100%',
+    maxHeight: 400,
     backgroundColor: 'rgb(245,245,245)',
     borderRadius: 5,
-    alignItems: 'center',
   },
   trainServicesBtnTxt: {
     color: 'black',
-    marginBottom: 4,
     fontSize: 16,
-    // fontWeight: 'bold',
-    textAlign: 'center',
+    padding: 10,
   },
   trainServiceSeparatorLine: {
+    borderWidth: 0.4,
     width: '100%',
-    height: StyleSheet.hairlineWidth,
-    position: 'absolute',
-    bottom: 0,
-    backgroundColor: 'rgb(185,185,185)',
-  },
-  smallModalView: {
-    width: '100%',
-    height: Dimensions.get('window').height / 4,
-    alignItems: 'center',
-    justifyContent: 'center',
+    margin: 2,
+    borderColor: 'rgb(185,185,185)',
   },
   cancelSubmissionBtn: {
     backgroundColor: '#5C5FC9',
-    borderRadius: 10,
-    padding: 10,
-    width: 150,
-    bottom: 0,
-    marginTop: 15,
+    padding: 15,
   },
 });
