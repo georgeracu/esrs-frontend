@@ -54,7 +54,7 @@ const AddJourneyModal = props => {
           <View style={styles.textInputContainer}>
             <TextInput
               value={props.ticketNumber}
-              style={styles.textInputBasic}
+              style={[styles.textInputBasic, styles.textInputNumRight]}
               placeholder="Ticket Number"
               onChangeText={text => props.onTicketNumberChange(text)}
             />
@@ -66,6 +66,14 @@ const AddJourneyModal = props => {
               keyboardType={'numeric'}
               onChangeText={text => props.onTicketPriceChange(text)}
             />
+          </View>
+
+          <View style={styles.modalButtonsContainer}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => props.openOCR()}>
+              <Text style={styles.textModalButton}>Auto-Fill From Ticket</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.modalButtonsContainer}>
@@ -150,6 +158,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CCCCCC',
     borderBottomWidth: 1,
   },
+  textInputNumRight: {
+    flexBasis: 1,
+    flexGrow: 1,
+    textAlign: 'center',
+  },
   textInputBasic: {
     fontFamily: 'sans-serif-light',
     height: 50,
@@ -159,6 +172,15 @@ const styles = StyleSheet.create({
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+  },
+  modalButton: {
+    color: '#FFFFFF',
+    backgroundColor: '#255C99',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 15,
+    fontFamily: 'sans-serif-medium',
+    fontSize: 15,
   },
   modalButtonLeft: {
     color: '#FFFFFF',

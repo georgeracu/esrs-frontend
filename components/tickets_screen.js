@@ -17,6 +17,7 @@ import AddJourneyModal from './add_journey_modal';
 import RNMlKit from 'react-native-firebase-mlkit';
 import ImagePicker from 'react-native-image-picker';
 
+
 const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
   const [journeyFrom, setJourneyFrom] = useState('');
@@ -128,7 +129,6 @@ const TicketsScreen = ({navigation}) => {
               price = price.split('X')[0];
               price = price.trim();
               price = price.replace(' ', '.');
-              //price = price.split("£")[1].split("X")[0].trim().replace(" ", ".");
               setTicketPrice(price);
             }
 
@@ -390,11 +390,6 @@ const TicketsScreen = ({navigation}) => {
         )}
       />
       <TouchableOpacity
-        style={[styles.fab, {bottom: 200}]}
-        onPress={() => getImage()}>
-        <Text style={styles.textPlusSymbol}>A</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
         style={[styles.fab, {bottom: 100}]}
         onPress={() => {
           navigation.navigate('TrainDepartureBoard');
@@ -409,6 +404,7 @@ const TicketsScreen = ({navigation}) => {
         <Text style={styles.textPlusSymbol}>+</Text>
       </TouchableOpacity>
       <AddJourneyModal
+        openOCR={getImage}
         visible={isModalVisible}
         onCancel={cancelJourney}
         onAddJourney={addJourney}
