@@ -52,26 +52,20 @@ const LoginScreen = ({navigation}) => {
             await AsyncStorage.setItem('email', email);
             await AsyncStorage.setItem('password', hash);
 
-            const response = await fetch('http://esrs.herokuapp.com/api/auth/user', {
+            const response = await fetch(`https://esrs-staging.herokuapp.com/api/auth/users/${credentials.user.uid}`, {
                 headers: {
                     method: 'GET',
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    user_id: credentials.user.uid,
                 },
             });
             if (response.status === 200) {
-                await AsyncStorage.setItem('isSignUpComplete', 'true');
                 const user = await response.json();
+                console.log(user);
                 await AsyncStorage.setItem('journeys', JSON.stringify(user.journeys));
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Tickets'}],
-                });
-            } else if (response.status === 401) {
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'UserCredentials'}],
                 });
             }
         } catch (error) {
