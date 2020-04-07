@@ -26,15 +26,38 @@ const SplashScreen = ({navigation}) => {
         routes: [{name: 'Login'}],
       });
     } else {
+      const credentials = await auth().signInWithEmailAndPassword(
+        email,
+        password,
+      );
       auth()
         .signInWithEmailAndPassword(email, password)
         .then(async () => {
-          navigation.reset({
-            index: 0,
-            routes: [{name: 'Tickets'}],
-          });
+          const response = await fetch(
+            `https://esrs-staging.herokuapp.com/api/auth/users/${
+              credentials.user.uid
+            }`,
+            {
+              headers: {
+                method: 'GET',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+            },
+          );
+          if (response.status === 200) {
+            const user = await response.json();
+            await AsyncStorage.setItem(
+              'journeys',
+              JSON.stringify(user.journeys),
+            );
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Tickets'}],
+            });
+          }
         })
-        .catch(err => {
+        .catch(_ => {
           navigation.reset({
             index: 0,
             routes: [{name: 'Login'}],

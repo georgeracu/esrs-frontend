@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View,
   FlatList,
-  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import messaging from '@react-native-firebase/messaging';
@@ -18,11 +17,9 @@ import moment from 'moment';
 import {stations} from '../utils/stations';
 import {useFocusEffect} from '@react-navigation/native';
 import AddJourneyModal from './add_journey_modal';
-import RNMlKit from 'react-native-firebase-mlkit';
-import ImagePicker from 'react-native-image-picker';
 
 const TicketDashboard = ({route, navigation}) => {
-  const {id, from, to, dateTime, price, number} = route.params;
+  const {user_id, id, from, to, dateTime, price, number} = route.params;
 
   const [journeyFrom, setJourneyFrom] = useState(from);
   const [journeyTo, setJourneyTo] = useState(to);
@@ -30,8 +27,8 @@ const TicketDashboard = ({route, navigation}) => {
   const [journeyTime, setJourneyTime] = useState(dateTime.split(' ')[1]);
   const [journeyLocation, toggleJourneyLocation] = useState('JF'); // Were JF denotes journeyFrom and JT is journeyTo
 
-  const [ticketNumber, setTicketNumber] = useState(number);
   const [ticketPrice, setTicketPrice] = useState(price);
+  const [ticketNumber, setTicketNumber] = useState(number);
 
   const [isAddJourneyModalVisible, toggleAddJourneyModalVisibility] = useState(
     false,
@@ -124,8 +121,6 @@ const TicketDashboard = ({route, navigation}) => {
         journey_from: journeyFrom,
         journey_to: journeyTo,
         journey_datetime: `${journeyDay} ${journeyTime}`,
-        ticket_price: ticketPrice,
-        ticket_number: ticketNumber,
       };
 
       const newJourneys = journeys.map(journey => {
@@ -141,15 +136,17 @@ const TicketDashboard = ({route, navigation}) => {
 
       toggleAddJourneyModalVisibility(false);
 
-      fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          user_id: id,
+      fetch(
+        `https://esrs-staging.herokuapp.com/api/auth/users/${user_id}/journeys/${id}`,
+        {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newJourney),
         },
-        body: JSON.stringify(newJourney),
-      });
+      );
     }
   };
 
@@ -217,14 +214,20 @@ const TicketDashboard = ({route, navigation}) => {
               index: 0,
               routes: [{name: 'Tickets'}],
             });
-            // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-            //   method: 'DELETE',
-            //   headers: {
-            //     Accept: 'application/json',
-            //     'Content-Type': 'application/json',
-            //     user_id: id,
-            //   },
-            // });
+            const deleteJourneysBody = {
+              ids: [id],
+            };
+            fetch(
+              `https://esrs-staging.herokuapp.com/api/auth/users/${user_id}/journeys`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(deleteJourneysBody),
+              },
+            );
           },
         },
       ],
