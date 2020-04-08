@@ -6,18 +6,22 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Progress from 'react-native-progress';
 
 const AddJourneyModal = props => {
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
   const [shouldShowDateTime, toggleShowDateTime] = useState(false);
+  const [progress, setProgress] = useState(false);
 
   return (
     <View>
-      <Modal isVisible={props.visible}>
+      <Modal isVisible={props.visible}> 
         <View style={styles.modal}>
+        
           <View style={styles.textInputContainer}>
             <TextInput
               value={props.departStation}
@@ -71,8 +75,8 @@ const AddJourneyModal = props => {
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
               style={styles.modalButton}
-              onPress={() => props.openOCR()}>
-              <Text style={styles.textModalButton}>Auto-Fill From Ticket</Text>
+              onPress={() => {props.openOCR(); props.onLoad(true);}}>
+              {props.load ? <Text style={styles.textModalButton}>Loading...</Text> : <Text style={styles.textModalButton}>Auto-Fill From Ticket</Text>}
             </TouchableOpacity>
           </View>
 
@@ -225,7 +229,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   dateText: {
-    fontFamily: 'sans-serif-thin',
+    fontFamily: 'sans-serif-light',
     fontSize: 12,
     textAlign: 'center',
   },
