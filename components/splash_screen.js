@@ -26,7 +26,7 @@ const SplashScreen = ({navigation}) => {
         routes: [{name: 'Login'}],
       });
     } else {
-      auth()
+      await auth()
         .signInWithEmailAndPassword(email, password)
         .then(async () => {
           navigation.reset({
@@ -34,7 +34,7 @@ const SplashScreen = ({navigation}) => {
             routes: [{name: 'Tickets'}],
           });
         })
-        .catch(err => {
+        .catch(_ => {
           navigation.reset({
             index: 0,
             routes: [{name: 'Login'}],

@@ -52,20 +52,9 @@ const RegisterScreen = ({navigation}) => {
                 await AsyncStorage.setItem('email', email);
                 await AsyncStorage.setItem('password', hash);
 
-                const userCredentials = {
-                    'user_id': credentials.user.uid,
-                    'email': email,
-                    'title': '',
-                    'first_name': '',
-                    'last_name': '',
-                    'phone': '',
-                    'country': '',
-                    'address': '',
-                    'town_city': '',
-                    'postcode': '',
-                };
+                const userCredentials = {'user_id': credentials.user.uid, 'email': email};
 
-                const response = await fetch('http://esrs.herokuapp.com/api/auth/user', {
+                const response = await fetch('https://esrs-staging.herokuapp.com/api/auth/users', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -73,7 +62,7 @@ const RegisterScreen = ({navigation}) => {
                     },
                     body: JSON.stringify(userCredentials),
                 });
-
+                console.log(response);
                 if (response.status === 201) {
                     await generateFCMToken(credentials.user.uid);
                     navigation.reset({

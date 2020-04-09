@@ -68,11 +68,11 @@ const TicketsScreen = ({navigation}) => {
   };
 
   const getImage = async () => {
-    
+
     cancelJourney();
     toggleModalVisibility(true);
-    
-    
+
+
 
     ImagePicker.showImagePicker(options, async response => {
       //console.log('Response = ', response);
@@ -111,8 +111,8 @@ const TicketsScreen = ({navigation}) => {
           for (var x in array) {
 
             var str = array[x];
-            if(String(str).split(' ')[0] == "National" || String(str).split(' ')[0] == "Rail" || String(str).split(' ')[0] == "ail" 
-            || String(str).split(' ')[0] == "ional" || String(str).split(' ')[0] == "onal" || String(str).split(' ')[0] == "Nati" 
+            if(String(str).split(' ')[0] == "National" || String(str).split(' ')[0] == "Rail" || String(str).split(' ')[0] == "ail"
+            || String(str).split(' ')[0] == "ional" || String(str).split(' ')[0] == "onal" || String(str).split(' ')[0] == "Nati"
             || String(str).split(' ')[0] == "al" || String(str).split(' ')[0] == "Ra" || String(str).split(' ')[0] == "tional"
             || String(str).split(' ')[0] == "nal" || String(str).split(' ')[0] == "ational" || String(str).split(' ')[0] == "lail"
             || String(str).split(' ')[0] == "Na" || String(str).split(' ')[0] == "pnal" || String(str).split(' ')[0] == "Bail"
@@ -255,13 +255,13 @@ const TicketsScreen = ({navigation}) => {
     if (isValid) {
       const journeyDetails = `${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`;
       const hash = await sha256(journeyDetails);
-      const journey = {
+      let journey = {
         journey_id: hash,
         journey_from: journeyFrom,
         journey_to: journeyTo,
         journey_datetime: `${journeyDay} ${journeyTime}`,
         ticket_price: ticketPrice,
-        ticket_number: ticketNumber,
+        ticket_number: ticketNumber.toUpperCase(),
       };
       setJourneys([...journeys, journey]);
 
@@ -276,20 +276,26 @@ const TicketsScreen = ({navigation}) => {
 
       AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
-      delete journey.isSelected;
-      delete journey.style;
+      journey = {
+        journey_id: hash,
+        journey_from: journeyFrom,
+        journey_to: journeyTo,
+        journey_datetime: `${journeyDay} ${journeyTime}`,
+      };
 
       toggleModalVisibility(false);
 
-      // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-      //   method: 'PUT',
-      //   headers: {
-      //     Accept: 'application/json',
-      //     'Content-Type': 'application/json',
-      //     user_id: id,
-      //   },
-      //   body: JSON.stringify(journey),
-      // });
+      fetch(
+        `https://esrs-staging.herokuapp.com/api/auth/users/${id}/journeys`,
+        {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(journey),
+        },
+      );
     }
   };
 
@@ -307,11 +313,23 @@ const TicketsScreen = ({navigation}) => {
     ) {
       Alert.alert('Add Journey', 'Oops, looks like you are missing something');
       isValid = false;
-    } else if (journeyFrom === journeyTo) {
+    }
+
+    if (journeyFrom === journeyTo) {
       Alert.alert(
         'Add Journey',
         "Oops, Departure and Destination can't be same",
       );
+      isValid = false;
+    }
+
+    if (!ticketNumber.toLowerCase().match('^([0-9|a-z]+)$')) {
+      Alert.alert('Add Journey', 'Ticket number cannot contain symbols');
+      isValid = false;
+    }
+
+    if (!ticketPrice.match('^([0-9]+)$')) {
+      Alert.alert('Add Journey', 'Ticket price must be a number only');
       isValid = false;
     }
     return isValid;
@@ -379,20 +397,33 @@ const TicketsScreen = ({navigation}) => {
             const unselectedJourneys = journeys.filter(
               journey => !journey.isSelected,
             );
+            const selectedJourneysArr = journeys
+              .filter(journey => journey.isSelected)
+              .map(selectedJourney => selectedJourney.journey_id);
+
             setJourneys(unselectedJourneys);
+
             updateSelectedJourneyCount(0);
+
             AsyncStorage.setItem(
               'journeys',
               JSON.stringify(unselectedJourneys),
             );
-            // fetch('http://esrs.herokuapp.com/api/auth/user/journey', {
-            //   method: 'DELETE',
-            //   headers: {
-            //     Accept: 'application/json',
-            //     'Content-Type': 'application/json',
-            //     user_id: id,
-            //   },
-            // });
+
+            const selectedJourneys = {
+              ids: selectedJourneysArr,
+            };
+            fetch(
+              `https://esrs-staging.herokuapp.com/api/auth/users/${id}/journeys`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(selectedJourneys),
+              },
+            );
           },
         },
       ],
@@ -440,11 +471,11 @@ const TicketsScreen = ({navigation}) => {
               }
               if (selectedJourneysCount === 0) {
                 navigation.navigate('TicketDashboard', {
+                  user_id: id,
                   id: journeys[index].journey_id,
                   from: journeys[index].journey_from,
                   to: journeys[index].journey_to,
                   dateTime: journeys[index].journey_datetime,
-                  type: journeys[index].ticket_type,
                   price: journeys[index].ticket_price,
                   number: journeys[index].ticket_number,
                 });
