@@ -126,6 +126,8 @@ const TicketDashboard = ({route, navigation}) => {
       const newJourneys = journeys.map(journey => {
         if (journey.journey_id === id) {
           newJourney.journey_id = journey.journey_id;
+          newJourney.ticket_price = ticketPrice;
+          newJourney.ticket_number = ticketNumber;
           return newJourney;
         }
       });
