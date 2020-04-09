@@ -6,18 +6,22 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Progress from 'react-native-progress';
 
 const AddJourneyModal = props => {
   const [dateTimeMode, toggleDateTimeMode] = useState('date');
   const [shouldShowDateTime, toggleShowDateTime] = useState(false);
+  const [progress, setProgress] = useState(false);
 
   return (
     <View>
-      <Modal isVisible={props.visible}>
+      <Modal isVisible={props.visible}> 
         <View style={styles.modal}>
+        
           <View style={styles.textInputContainer}>
             <TextInput
               value={props.departStation}
@@ -54,7 +58,7 @@ const AddJourneyModal = props => {
           <View style={styles.textInputContainer}>
             <TextInput
               value={props.ticketNumber}
-              style={styles.textInputBasic}
+              style={[styles.textInputBasic, styles.textInputNumRight]}
               placeholder="Ticket Number"
               onChangeText={text => props.onTicketNumberChange(text)}
             />
@@ -66,6 +70,14 @@ const AddJourneyModal = props => {
               keyboardType={'numeric'}
               onChangeText={text => props.onTicketPriceChange(text)}
             />
+          </View>
+
+          <View style={styles.modalButtonsContainer}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {props.openOCR(); props.onLoad(true);}}>
+              {props.load ? <Text style={styles.textModalButton}>Loading...</Text> : <Text style={styles.textModalButton}>Auto-Fill From Ticket</Text>}
+            </TouchableOpacity>
           </View>
 
           <View style={styles.modalButtonsContainer}>
@@ -150,6 +162,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CCCCCC',
     borderBottomWidth: 1,
   },
+  textInputNumRight: {
+    flexBasis: 1,
+    flexGrow: 1,
+    textAlign: 'center',
+  },
   textInputBasic: {
     fontFamily: 'sans-serif-light',
     height: 50,
@@ -159,6 +176,15 @@ const styles = StyleSheet.create({
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+  },
+  modalButton: {
+    color: '#FFFFFF',
+    backgroundColor: '#255C99',
+    flexBasis: 1,
+    flexGrow: 1,
+    padding: 15,
+    fontFamily: 'sans-serif-medium',
+    fontSize: 15,
   },
   modalButtonLeft: {
     color: '#FFFFFF',
@@ -203,7 +229,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   dateText: {
-    fontFamily: 'sans-serif-thin',
+    fontFamily: 'sans-serif-light',
     fontSize: 12,
     textAlign: 'center',
   },

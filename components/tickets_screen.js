@@ -16,6 +16,8 @@ import {stations} from '../utils/stations';
 import AddJourneyModal from './add_journey_modal';
 import RNMlKit from 'react-native-firebase-mlkit';
 import ImagePicker from 'react-native-image-picker';
+import * as Progress from 'react-native-progress';
+
 
 const TicketsScreen = ({navigation}) => {
   const [selectedJourneysCount, updateSelectedJourneyCount] = useState(0);
@@ -37,6 +39,9 @@ const TicketsScreen = ({navigation}) => {
   const [stationsSuggestions, setStationsSuggestions] = useState([]);
 
   const [ticketImage, setTicketImage] = useState({});
+
+  const [loading, setLoading] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
 
   useEffect(() => {
     async function getPersistedJourneys() {
@@ -63,17 +68,25 @@ const TicketsScreen = ({navigation}) => {
   };
 
   const getImage = async () => {
-    console.log('HEY: ', moment(new Date('1737')).format('HH:mm'));
+    
+    cancelJourney();
+    toggleModalVisibility(true);
+    
+    
+
     ImagePicker.showImagePicker(options, async response => {
       //console.log('Response = ', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
+        setLoading(false);
         //return false;
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
+        setLoading(false);
         //return false;
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
+        setLoading(false);
         //return false;
       } else {
         const source = {
@@ -85,72 +98,131 @@ const TicketsScreen = ({navigation}) => {
         const deviceTextRecognition = await RNMlKit.deviceTextRecognition(
           response.uri,
         );
-        console.log('HELLO');
+        /*console.log('HELLO');
         console.log(
           'Text Recognition On-Device',
           deviceTextRecognition[4].resultText,
         );
-        console.log('HELLO', deviceTextRecognition.length);
-
-        for (let i = 0; i < deviceTextRecognition.length; i++) {
+        console.log('HELLO', deviceTextRecognition.length);*/
+        setLoading(true);
+        for (let i = 0; i < 2; i++) {
+          setLoadProgress(i/deviceTextRecognition.length);
           const array = deviceTextRecognition[i].resultText.split('\n');
           for (var x in array) {
-            console.log(array[x]);
 
             var str = array[x];
-
-            var pattern = new RegExp('^[0-9-]*$');
-            var res = pattern.test(str);
-            if (res) {
-              setTicketNumber(String(array[x]));
+            if(String(str).split(' ')[0] == "National" || String(str).split(' ')[0] == "Rail" || String(str).split(' ')[0] == "ail" 
+            || String(str).split(' ')[0] == "ional" || String(str).split(' ')[0] == "onal" || String(str).split(' ')[0] == "Nati" 
+            || String(str).split(' ')[0] == "al" || String(str).split(' ')[0] == "Ra" || String(str).split(' ')[0] == "tional"
+            || String(str).split(' ')[0] == "nal" || String(str).split(' ')[0] == "ational" || String(str).split(' ')[0] == "lail"
+            || String(str).split(' ')[0] == "Na" || String(str).split(' ')[0] == "pnal" || String(str).split(' ')[0] == "Bail"
+            || String(str).split(' ')[0] == "Date" || String(str).split(' ')[0] == "Refundable" || String(str).split(' ')[0] == "Adult"
+            || String(str).split(' ')[0] == "Valid" || String(str).split(' ')[0] == "D" || String(str).split(' ')[0] == "Hal"
+            || String(str).split(' ')[0] == "at" || String(str).split(' ')[0] == "Rl" || String(str).split(' ')[0] == "tion"
+            || String(str).split(' ')[0] == "Anytime" || String(str).split(' ')[0] == "aNational" || String(str).split(' ')[0] == "ait"
+            || String(str).split(' ')[0] == "mal" || String(str).split(' ')[0] == "al1d") {
+              continue;
             }
 
-            let day = new Date(String(array[x]));
-            if (JSON.stringify(day) != 'null') {
-              let daytime = moment(new Date(day)).format('DD-MM-YYYY');
-              setJourneyDay(daytime);
+            console.log(array[x]);
+
+            if(ticketNumber == '') {
+              var pattern = new RegExp('^[0-9-]*$');
+              var res = pattern.test(str);
+              if (res) {
+                setTicketNumber(String(array[x]));
+              }
             }
 
-            var pattern = new RegExp('^[0-9]*:');
-            var res = pattern.test(str);
-            if (res) {
-              let time = String(array[x]);
-              time = time.split(':')[0];
-              time = time.slice(0, 2) + ':' + time.slice(2);
-              setJourneyTime(time);
+            if(journeyDay == 'DD-MM-YYYY' || journeyTime == 'HH:mm') {
+              var pattern = new RegExp('^[0-9]*:');
+              var res = pattern.test(str);
+              if (res) {
+                let time = String(array[x]);
+                let date = time.split(':')[1];
+                time = time.split(':')[0];
+                time = time.slice(0, 2) + ':' + time.slice(2);
+                setJourneyTime(time);
+
+                let dateFormat = date.slice(2,4) + "/" + date.slice(0,2) + "/20" + date.slice(4,6);
+                let daytime = moment(new Date(dateFormat)).format('DD-MM-YYYY');
+                setJourneyDay(daytime);
+              }
+
+              var pattern = new RegExp('^[0-9]* ');
+              var res = pattern.test(str);
+              if (res) {
+                let time = String(array[x]);
+                let date = time.split(' ')[1];
+                time = time.split(' ')[0];
+                time = time.slice(0, 2) + ':' + time.slice(2);
+                setJourneyTime(time);
+
+                let dateFormat = date.slice(2,4) + "/" + date.slice(0,2) + "/20" + date.slice(4,6);
+                let daytime = moment(new Date(dateFormat)).format('DD-MM-YYYY');
+                setJourneyDay(daytime);
+              }
             }
 
-            var pattern = new RegExp('£+');
-            var res = pattern.test(str);
-            if (res) {
-              let price = String(array[x]);
-              price = price.split('£')[1];
-              price = price.split('X')[0];
-              price = price.trim();
-              price = price.replace(' ', '.');
-              //price = price.split("£")[1].split("X")[0].trim().replace(" ", ".");
-              setTicketPrice(price);
+            if(ticketPrice == '') {
+              var pattern = new RegExp('£+');
+              var res = pattern.test(str);
+              if (res) {
+                let price = String(array[x]);
+                price = price.split('£')[1];
+                price = price.split('X')[0];
+                price = price.split('K')[0];
+                price = price.trim();
+                price = price.replace(' ', '.');
+                setTicketPrice(price);
+              } 
+
+              var pattern = new RegExp('f+');
+              var res = pattern.test(str);
+              if (res) {
+                let price = String(array[x]);
+                price = price.split('f')[1];
+                price = price.split('X')[0];
+                price = price.split('K')[0];
+                price = price.trim();
+                price = price.replace(' ', '.');
+                setTicketPrice(price);
+              }
+
+              var pattern = new RegExp('^[0-9.]* X+$');
+              var res = pattern.test(str);
+              if (res) {
+                let price = String(array[x]);
+                price = price.split('X')[0];
+                price = price.split('K')[0];
+                price = price.trim();
+                setTicketPrice(price);
+              }
             }
 
-            if (str.split(' ')[0] == 'to' || str.split(' ')[0] == 'from') {
-              for (let i = 0; i < stations.names.length; i++) {
-                var key = stations.names[i];
-                const regex = /^\w+( \w+| \&+)*/g;
-                const found = key.match(regex);
-                var from = array[x].substring(5);
-                var to = array[x].substring(3);
-                if (String(found[0]) == String(from)) {
-                  console.log(stations.codes[i]);
-                  setJourneyFrom(String(stations.codes[i]));
-                }
-                if (String(found[0]) == String(to)) {
-                  console.log(stations.codes[i]);
-                  setJourneyTo(String(stations.codes[i]));
+
+            if(journeyTo == '' || journeyFrom == '') {
+              if (str.split(' ')[0] == 'to' || str.split(' ')[0] == 'from' || str.split(' ')[0] == 'fron') {
+                for (let i = 0; i < stations.names.length; i++) {
+                  const key = stations.names[i];
+                  const regex = /^\w+( \w+| \&+)*/g;
+                  const found = key.match(regex);
+                  const from = array[x].substring(5).split(" ")[0];
+                  var to = array[x].substring(3).split(" ")[0];
+                  if (String(found[0]) == String(from)) {
+                    console.log(stations.codes[i]);
+                    setJourneyFrom(String(stations.codes[i]));
+                  }
+                  if (String(found[0]) == String(to)) {
+                    console.log(stations.codes[i]);
+                    setJourneyTo(String(stations.codes[i]));
+                  }
                 }
               }
             }
           }
         }
+        setLoading(false);
       }
     });
   };
@@ -198,6 +270,7 @@ const TicketsScreen = ({navigation}) => {
       setTicketPrice('');
       setJourneyDay('DD-MM-YYYY');
       setJourneyTime('HH:mm');
+      setLoading(false);
 
       AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
@@ -269,9 +342,10 @@ const TicketsScreen = ({navigation}) => {
     setJourneyTo('');
     setTicketNumber('');
     setTicketPrice('');
-    setJourneyDay(moment(new Date()).format('DD-MM-YYYY'));
-    setJourneyTime(moment(new Date()).format('HH:mm'));
+    setJourneyDay('DD-MM-YYYY');
+    setJourneyTime('HH:mm');
     toggleModalVisibility(false);
+    setLoading(false);
   };
 
   /**
@@ -360,6 +434,7 @@ const TicketsScreen = ({navigation}) => {
         <View style={styles.viewSeeTravels}>
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>journeys</Text>
+          <Progress.Bar progress={0.3} width={100} />
         </View>
         <TouchableOpacity
           onPress={() => {
@@ -421,11 +496,6 @@ const TicketsScreen = ({navigation}) => {
         )}
       />
       <TouchableOpacity
-        style={[styles.fab, {bottom: 200}]}
-        onPress={() => getImage()}>
-        <Text style={styles.textPlusSymbol}>A</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
         style={[styles.fab, {bottom: 100}]}
         onPress={() => {
           navigation.navigate('TrainDepartureBoard');
@@ -440,6 +510,7 @@ const TicketsScreen = ({navigation}) => {
         <Text style={styles.textPlusSymbol}>+</Text>
       </TouchableOpacity>
       <AddJourneyModal
+        openOCR={getImage}
         visible={isModalVisible}
         onCancel={cancelJourney}
         onAddJourney={addJourney}
@@ -467,6 +538,10 @@ const TicketsScreen = ({navigation}) => {
         journeyTime={journeyTime}
         ticketNumber={ticketNumber}
         ticketPrice={ticketPrice}
+        load={loading}
+        loadNum={loadProgress}
+        onLoad={num => setLoading(num)}
+        onLoadNum={num => setLoadProgress(num)}
         positiveButtonName="Add Journey"
       />
     </View>
@@ -474,6 +549,7 @@ const TicketsScreen = ({navigation}) => {
 };
 
 export default TicketsScreen;
+
 
 const styles = StyleSheet.create({
   root: {
