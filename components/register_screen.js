@@ -54,7 +54,7 @@ const RegisterScreen = ({navigation}) => {
 
                 const userCredentials = {'user_id': credentials.user.uid, 'email': email};
 
-                const response = await fetch('https://esrs-staging.herokuapp.com/api/auth/user', {
+                const response = await fetch('https://esrs-staging.herokuapp.com/api/auth/users', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -62,6 +62,7 @@ const RegisterScreen = ({navigation}) => {
                     },
                     body: JSON.stringify(userCredentials),
                 });
+                console.log(response);
                 if (response.status === 201) {
                     await generateFCMToken(credentials.user.uid);
                     navigation.reset({
