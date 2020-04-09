@@ -149,7 +149,7 @@ android {
         }
     }
     signingConfigs {
-        def keysFilePath = file("E:/ESRS/integrate/departure/trainwallet_key.json").toString()
+        def keysFilePath = file("/Users/nonsobiose/Documents/trainwallet_key.json").toString()
         def keysFile = new File(keysFilePath, "").getText('UTF-8')
         def json = new groovy.json.JsonSlurper().parseText(keysFile)
         debug {

@@ -68,11 +68,11 @@ const TicketsScreen = ({navigation}) => {
   };
 
   const getImage = async () => {
-    
+
     cancelJourney();
     toggleModalVisibility(true);
-    
-    
+
+
 
     ImagePicker.showImagePicker(options, async response => {
       //console.log('Response = ', response);
@@ -111,8 +111,8 @@ const TicketsScreen = ({navigation}) => {
           for (var x in array) {
 
             var str = array[x];
-            if(String(str).split(' ')[0] == "National" || String(str).split(' ')[0] == "Rail" || String(str).split(' ')[0] == "ail" 
-            || String(str).split(' ')[0] == "ional" || String(str).split(' ')[0] == "onal" || String(str).split(' ')[0] == "Nati" 
+            if(String(str).split(' ')[0] == "National" || String(str).split(' ')[0] == "Rail" || String(str).split(' ')[0] == "ail"
+            || String(str).split(' ')[0] == "ional" || String(str).split(' ')[0] == "onal" || String(str).split(' ')[0] == "Nati"
             || String(str).split(' ')[0] == "al" || String(str).split(' ')[0] == "Ra" || String(str).split(' ')[0] == "tional"
             || String(str).split(' ')[0] == "nal" || String(str).split(' ')[0] == "ational" || String(str).split(' ')[0] == "lail"
             || String(str).split(' ')[0] == "Na" || String(str).split(' ')[0] == "pnal" || String(str).split(' ')[0] == "Bail"
@@ -175,7 +175,7 @@ const TicketsScreen = ({navigation}) => {
                 price = price.trim();
                 price = price.replace(' ', '.');
                 setTicketPrice(price);
-              } 
+              }
 
               var pattern = new RegExp('f+');
               var res = pattern.test(str);
@@ -434,7 +434,6 @@ const TicketsScreen = ({navigation}) => {
         <View style={styles.viewSeeTravels}>
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>journeys</Text>
-          <Progress.Bar progress={0.3} width={100} />
         </View>
         <TouchableOpacity
           onPress={() => {

@@ -26,11 +26,7 @@ const SplashScreen = ({navigation}) => {
         routes: [{name: 'Login'}],
       });
     } else {
-      const credentials = await auth().signInWithEmailAndPassword(
-        email,
-        password,
-      );
-      auth()
+      await auth()
         .signInWithEmailAndPassword(email, password)
         .then(async () => {
           navigation.reset({
