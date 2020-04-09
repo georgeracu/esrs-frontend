@@ -175,28 +175,28 @@ const TicketsScreen = ({navigation}) => {
                 price = price.trim();
                 price = price.replace(' ', '.');
                 setTicketPrice(price);
-              } 
-
-              var pattern = new RegExp('f+');
-              var res = pattern.test(str);
-              if (res) {
-                let price = String(array[x]);
-                price = price.split('f')[1];
-                price = price.split('X')[0];
-                price = price.split('K')[0];
-                price = price.trim();
-                price = price.replace(' ', '.');
-                setTicketPrice(price);
-              }
-
-              var pattern = new RegExp('^[0-9.]* X+$');
-              var res = pattern.test(str);
-              if (res) {
-                let price = String(array[x]);
-                price = price.split('X')[0];
-                price = price.split('K')[0];
-                price = price.trim();
-                setTicketPrice(price);
+              } else {
+                var pattern = new RegExp('f+[0-9]');
+                var res = pattern.test(str);
+                if (res) {
+                  let price = String(array[x]);
+                  price = price.split('f')[1];
+                  price = price.split('X')[0];
+                  price = price.split('K')[0];
+                  price = price.trim();
+                  price = price.replace(' ', '.');
+                  setTicketPrice(price);
+                } else {
+                  var pattern = new RegExp('^[0-9.]* X+$');
+                  var res = pattern.test(str);
+                  if (res) {
+                    let price = String(array[x]);
+                    price = price.split('X')[0];
+                    price = price.split('K')[0];
+                    price = price.trim();
+                    setTicketPrice(price);
+                  }
+                }
               }
             }
 
@@ -207,8 +207,10 @@ const TicketsScreen = ({navigation}) => {
                   const key = stations.names[i];
                   const regex = /^\w+( \w+| \&+)*/g;
                   const found = key.match(regex);
-                  const from = array[x].substring(5).split(" ")[0];
-                  var to = array[x].substring(3).split(" ")[0];
+                  let from = array[x].substring(5);
+                  from = from.match(regex);
+                  let to = array[x].substring(3);
+                  to = to.match(regex);
                   if (String(found[0]) == String(from)) {
                     console.log(stations.codes[i]);
                     setJourneyFrom(String(stations.codes[i]));
@@ -403,7 +405,6 @@ const TicketsScreen = ({navigation}) => {
         <View style={styles.viewSeeTravels}>
           <Text style={styles.textSeeTravels}>See your</Text>
           <Text style={styles.textSeeTravels}>journeys</Text>
-          <Progress.Bar progress={0.3} width={100} />
         </View>
         <TouchableOpacity
           onPress={() => {
