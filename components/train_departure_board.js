@@ -106,6 +106,7 @@ const TrainDepartureBoardScreen = ({navigation}) => {
               setStationsSuggestions([]);
             }}>
             <Text style={styles.listItem}>{item}</Text>
+            <View style={styles.trainServiceSeparatorLine} />
           </TouchableOpacity>
         )}
       />
@@ -139,7 +140,7 @@ const TrainDepartureBoardScreen = ({navigation}) => {
                   <Text style={styles.departureText}>DEPARTURE</Text>
                   <Text style={styles.LocationName}>{item.departName}</Text>
                   <Text style={styles.boldDetails}>
-                    ESTIMATED TIME: {item.etd}
+                    SCHEDULED TIME: {item.std}
                   </Text>
                   <Text style={styles.boldDetails}>
                     PLATFORM: {item.platform}
@@ -195,12 +196,15 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif-light',
   },
   listItem: {
-    marginTop: 8,
-    marginBottom: 8,
-    marginLeft: 20,
-    marginRight: 20,
+    padding: 15,
     fontSize: 15,
     color: '#000000',
+  },
+  trainServiceSeparatorLine: {
+    borderWidth: 0.4,
+    width: '100%',
+    margin: 2,
+    borderColor: 'rgb(185,185,185)',
   },
   departureView: {
     flexDirection: 'row',
