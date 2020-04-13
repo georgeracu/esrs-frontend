@@ -61,7 +61,6 @@ const LoginScreen = ({navigation}) => {
             });
             if (response.status === 200) {
                 const user = await response.json();
-                console.log(user);
                 await AsyncStorage.setItem('journeys', JSON.stringify(user.journeys));
                 navigation.reset({
                     index: 0,

@@ -49,6 +49,7 @@ const TicketsScreen = ({navigation}) => {
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
+        console.log(parsedJourneysJson);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
           journey.isSelected = false;
           journey.style = styles.journeyView;
@@ -263,6 +264,7 @@ const TicketsScreen = ({navigation}) => {
         ticket_price: ticketPrice,
         ticket_number: ticketNumber.toUpperCase(),
       };
+
       setJourneys([...journeys, journey]);
 
       // Clear inputs
@@ -276,14 +278,14 @@ const TicketsScreen = ({navigation}) => {
 
       AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
 
+      toggleModalVisibility(false);
+
       journey = {
         journey_id: hash,
         journey_from: journeyFrom,
         journey_to: journeyTo,
         journey_datetime: `${journeyDay} ${journeyTime}`,
       };
-
-      toggleModalVisibility(false);
 
       fetch(
         `https://esrs-staging.herokuapp.com/api/auth/users/${id}/journeys`,
@@ -306,30 +308,30 @@ const TicketsScreen = ({navigation}) => {
     let isValid = true;
     if (
       !stations.codes.includes(journeyFrom) ||
-      !stations.codes.includes(journeyTo) ||
-      ticketNumber === '' ||
-      ticketPrice === '' ||
-      (journeyDay === 'DD-MM-YYYY' && journeyTime === 'HH:mm')
+      !stations.codes.includes(journeyTo)
     ) {
-      Alert.alert('Add Journey', 'Oops, looks like you are missing something');
+      Alert.alert('Add Journey', 'Oops, Please select your stations');
       isValid = false;
-    }
-
-    if (journeyFrom === journeyTo) {
+    } else if (journeyFrom === journeyTo) {
       Alert.alert(
         'Add Journey',
         "Oops, Departure and Destination can't be same",
       );
       isValid = false;
-    }
-
-    if (!ticketNumber.toLowerCase().match('^([0-9|a-z]+)$')) {
-      Alert.alert('Add Journey', 'Ticket number cannot contain symbols');
+    } else if (journeyDay === 'DD-MM-YYYY' && journeyTime === 'HH:mm') {
+      Alert.alert('Add Journey', 'Oops, Please select a date');
       isValid = false;
-    }
-
-    if (!ticketPrice.match('^([0-9]+)$')) {
-      Alert.alert('Add Journey', 'Ticket price must be a number only');
+    } else if (ticketNumber === '') {
+      Alert.alert('Add Journey', 'Please input a ticket number');
+      isValid = false;
+    } else if (!ticketNumber.toLowerCase().match('^([0-9|a-z]+)$')) {
+      Alert.alert('Add Journey', 'Invalid ticket number');
+      isValid = false;
+    } else if (ticketPrice === '') {
+      Alert.alert('Add Journey', 'Please input a ticket amount');
+      isValid = false;
+    } else if (!ticketPrice.match('^([0-9]+(\\.[0-9]{2})?)$')) {
+      Alert.alert('Add Journey', 'Invalid amount');
       isValid = false;
     }
     return isValid;
