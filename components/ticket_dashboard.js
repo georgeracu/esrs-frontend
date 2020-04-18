@@ -62,6 +62,7 @@ const TicketDashboard = ({route, navigation}) => {
         setJourneys(parsedJourneysJson);
       }
     }
+
     getPersistedJourneys();
 
     messaging().onMessage(remoteMessage => {
@@ -117,26 +118,30 @@ const TicketDashboard = ({route, navigation}) => {
       setTicketPrice(ticketPrice);
       setTicketNumber(ticketNumber);
 
-      const newJourney = {
-        journey_from: journeyFrom,
-        journey_to: journeyTo,
-        journey_datetime: `${journeyDay} ${journeyTime}`,
-      };
+      let newJourney = {};
 
-      const newJourneys = journeys.map(journey => {
+      let newJourneys = journeys.map(journey => {
         if (journey.journey_id === id) {
-          newJourney.journey_id = journey.journey_id;
-          newJourney.ticket_price = ticketPrice;
-          newJourney.ticket_number = ticketNumber;
-          return newJourney;
+          journey.journey_from = journeyFrom;
+          journey.journey_to = journeyTo;
+          journey.journey_datetime = `${journeyDay} ${journeyTime}`;
+          journey.ticket_price = ticketPrice;
+          journey.ticket_number = ticketNumber;
+          newJourney = journey;
+          return journey;
         }
+        return journey;
       });
 
       AsyncStorage.setItem('journeys', JSON.stringify(newJourneys));
 
-      delete newJourney.id;
-
       toggleAddJourneyModalVisibility(false);
+
+      newJourney = {
+        journey_from: journeyFrom,
+        journey_to: journeyTo,
+        journey_datetime: `${journeyDay} ${journeyTime}`,
+      };
 
       fetch(
         `https://esrs-staging.herokuapp.com/api/auth/users/${user_id}/journeys/${id}`,
@@ -159,18 +164,30 @@ const TicketDashboard = ({route, navigation}) => {
     let isValid = true;
     if (
       !stations.codes.includes(journeyFrom) ||
-      !stations.codes.includes(journeyTo) ||
-      ticketNumber === '' ||
-      ticketPrice === '' ||
-      (journeyDay === '' && journeyTime === '')
+      !stations.codes.includes(journeyTo)
     ) {
-      Alert.alert('Add Journey', 'Oops, looks like you are missing something');
+      Alert.alert('Add Journey', 'Oops, Please select your stations');
       isValid = false;
     } else if (journeyFrom === journeyTo) {
       Alert.alert(
         'Add Journey',
         "Oops, Departure and Destination can't be same",
       );
+      isValid = false;
+    } else if (journeyDay === '' && journeyTime === '') {
+      Alert.alert('Add Journey', 'Oops, Please select a date');
+      isValid = false;
+    } else if (ticketNumber === '') {
+      Alert.alert('Add Journey', 'Please input a ticket number');
+      isValid = false;
+    } else if (!ticketNumber.toLowerCase().match('^([0-9|a-z]+)$')) {
+      Alert.alert('Add Journey', 'Invalid ticket number');
+      isValid = false;
+    } else if (ticketPrice === '') {
+      Alert.alert('Add Journey', 'Please input a ticket amount');
+      isValid = false;
+    } else if (!ticketPrice.match('^([0-9]+(\\.[0-9]{2})?)$')) {
+      Alert.alert('Add Journey', 'Invalid amount');
       isValid = false;
     }
     return isValid;

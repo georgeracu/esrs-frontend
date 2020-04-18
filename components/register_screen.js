@@ -62,7 +62,6 @@ const RegisterScreen = ({navigation}) => {
                     },
                     body: JSON.stringify(userCredentials),
                 });
-                console.log(response);
                 if (response.status === 201) {
                     await generateFCMToken(credentials.user.uid);
                     navigation.reset({
