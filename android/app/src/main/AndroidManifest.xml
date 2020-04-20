@@ -2,7 +2,7 @@
   package="com.esrs">
 
     <uses-permission android:name="android.permission.INTERNET" />
-	
+
 	<!-- Required -->
 	<uses-permission android:name="android.permission.CAMERA" />
 
@@ -18,7 +18,7 @@
 	  android:largeHeap="true"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
-      android:roundIcon="@mipmap/ic_launcher_round"
+      android:roundIcon="@mipmap/ic_launcher"
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true">
@@ -33,10 +33,10 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-	  
+
 	  <meta-data
 		  android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-		  android:value="ocr" 
+		  android:value="ocr"
 		  />
     </application>
 

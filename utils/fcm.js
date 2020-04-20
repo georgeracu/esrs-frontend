@@ -3,7 +3,7 @@ import messaging from '@react-native-firebase/messaging';
 export default async function generateFCMToken(userId) {
   const fcmToken = await messaging().getToken();
   return await fetch(
-    `https://esrs-staging.herokuapp.com/api/auth/user/${userId}/token`,
+    `https://esrs-staging.herokuapp.com/api/auth/users/${userId}/token`,
     {
       method: 'PUT',
       headers: {
