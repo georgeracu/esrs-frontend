@@ -148,28 +148,14 @@ android {
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
-    signingConfigs {
-        debug {
-            storeFile file(DEBUG_KEYSTORE_FILE)
-            storePassword "android"
-            keyAlias DEBUG_KEYSTORE_ALIAS
-            keyPassword "android"
-        }
-        release {
-            storeFile file(RELEASE_KEYSTORE_FILE)
-            storePassword 123456
-            keyAlias RELEASE_KEYSTORE_ALIAS
-            keyPassword 123456
-        }
-    }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            //signingConfig signingConfigs.debug
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            //signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
