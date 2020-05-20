@@ -149,9 +149,6 @@ android {
         }
     }
     signingConfigs {
-        def keysFilePath = file("/Users/nonsobiose/Documents/trainwallet_key.json").toString()
-        def keysFile = new File(keysFilePath, "").getText('UTF-8')
-        def json = new groovy.json.JsonSlurper().parseText(keysFile)
         debug {
             storeFile file(DEBUG_KEYSTORE_FILE)
             storePassword "android"
