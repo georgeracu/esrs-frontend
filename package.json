@@ -43,20 +43,33 @@
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.6",
     "@babel/runtime": "^7.9.6",
     "@react-native-community/eslint-config": "^0.0.5",
     "babel-jest": "^24.9.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-to-json": "^3.4.4",
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
+    "react-native-testing-library": "^1.14.0",
     "react-test-renderer": "16.9.0"
   },
   "jest": {
     "preset": "react-native",
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "setupFiles": [
-      "./jest_setup_files/setupfiles.js"
+      "./setupTests.js"
+    ],
+    "setupFilesAfterEnv": [
+      "./__mocks__/mockFirebase"
+    ],
+    "automock": false,
+    "transformIgnorePatterns": [
+      "node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"
     ]
   },
   "plugins": [

@@ -1,0 +1,239 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SplashScreen should render correctly in "debug" mode 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "center",
+      "padding": 20,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#4F4F4F",
+        "fontFamily": "Verdana",
+        "fontSize": 25,
+        "fontWeight": "bold",
+        "textAlign": "center",
+      }
+    }
+  >
+    Train Wallet
+  </Text>
+</View>
+`;
+
+exports[`TicketsScreen should render correctly in "debug" mode 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "rgba(104, 126, 252, 0.1)",
+      "bottom": 0,
+      "left": 0,
+      "padding": 20,
+      "position": "absolute",
+      "right": 0,
+      "top": 0,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "marginBottom": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#190320",
+            "fontFamily": "sans-serif-thin",
+            "fontSize": 30,
+            "fontWeight": "bold",
+          }
+        }
+      >
+        See your
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#190320",
+            "fontFamily": "sans-serif-thin",
+            "fontSize": 30,
+            "fontWeight": "bold",
+          }
+        }
+      >
+        journeys
+      </Text>
+    </View>
+    <TouchableOpacity
+      activeOpacity={0.2}
+      onPress={[Function]}
+    />
+  </View>
+  <View
+    style={
+      Object {
+        "height": 60,
+        "marginTop": 10,
+      }
+    }
+  >
+    <TextInput
+      allowFontScaling={true}
+      rejectResponderTermination={true}
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "borderColor": "#CCCCCC",
+          "borderRadius": 8,
+          "borderWidth": 1,
+          "fontFamily": "sans-serif-light",
+          "padding": 20,
+        }
+      }
+      underlineColorAndroid="transparent"
+    />
+    <Image
+      source={
+        Object {
+          "testUri": "../../../resources/search.png",
+        }
+      }
+      style={
+        Object {
+          "position": "absolute",
+          "right": 20,
+          "top": 20,
+        }
+      }
+    />
+  </View>
+  <FlatList
+    ListEmptyComponent={[Function]}
+    contentContainerStyle={
+      Object {
+        "alignItems": "center",
+        "flexGrow": 1,
+        "justifyContent": "center",
+      }
+    }
+    data={Array []}
+    disableVirtualization={false}
+    extraData={Array []}
+    horizontal={false}
+    initialNumToRender={10}
+    keyExtractor={[Function]}
+    maxToRenderPerBatch={10}
+    numColumns={1}
+    onEndReachedThreshold={2}
+    removeClippedSubviews={false}
+    renderItem={[Function]}
+    scrollEventThrottle={50}
+    updateCellsBatchingPeriod={50}
+    windowSize={21}
+  />
+  <TouchableOpacity
+    activeOpacity={0.2}
+    onPress={[Function]}
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#687DFC",
+          "borderRadius": 200,
+          "bottom": 20,
+          "elevation": 10,
+          "height": 60,
+          "justifyContent": "center",
+          "position": "absolute",
+          "right": 20,
+          "width": 60,
+        },
+        Object {
+          "bottom": 100,
+        },
+      ]
+    }
+  >
+    <Image
+      source={
+        Object {
+          "testUri": "../../../resources/train.png",
+        }
+      }
+    />
+  </TouchableOpacity>
+  <TouchableOpacity
+    activeOpacity={0.2}
+    onPress={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#687DFC",
+        "borderRadius": 200,
+        "bottom": 20,
+        "elevation": 10,
+        "height": 60,
+        "justifyContent": "center",
+        "position": "absolute",
+        "right": 20,
+        "width": 60,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#FFFFFF",
+          "fontSize": 30,
+        }
+      }
+    >
+      +
+    </Text>
+  </TouchableOpacity>
+  <AddJourneyModal
+    departStation=""
+    destStation=""
+    journeyDay="DD-MM-YYYY"
+    journeyTime="HH:mm"
+    load={false}
+    loadNum={0}
+    onAddJourney={[Function]}
+    onCancel={[Function]}
+    onDepartStationInputFocus={[Function]}
+    onDestStationInputFocus={[Function]}
+    onLoad={[Function]}
+    onLoadNum={[Function]}
+    onSearchStation={[Function]}
+    onSelectStation={[Function]}
+    onSetJourneyDay={[Function]}
+    onSetJourneyTime={[Function]}
+    onTicketNumberChange={[Function]}
+    onTicketPriceChange={[Function]}
+    openOCR={[Function]}
+    positiveButtonName="Add Journey"
+    stations={Array []}
+    ticketNumber=""
+    ticketPrice=""
+    visible={false}
+  />
+</View>
+`;
