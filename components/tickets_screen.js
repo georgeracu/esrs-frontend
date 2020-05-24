@@ -1,14 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {
-  Alert,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Alert, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import {sha256} from 'react-native-sha256';
@@ -16,7 +7,6 @@ import {stations} from '../utils/stations';
 import AddJourneyModal from './add_journey_modal';
 import RNMlKit from 'react-native-firebase-mlkit';
 import ImagePicker from 'react-native-image-picker';
-import * as Progress from 'react-native-progress';
 
 
 const TicketsScreen = ({navigation}) => {
@@ -43,13 +33,14 @@ const TicketsScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
 
+  const [addTicketButtonText, setAddTicketButtonText] = useState("Add Journey");
+
   useEffect(() => {
     async function getPersistedJourneys() {
       setId(await AsyncStorage.getItem('id'));
       const persistedJourneys = await AsyncStorage.getItem('journeys');
       if (persistedJourneys != null) {
         const parsedJourneysJson = JSON.parse(persistedJourneys);
-        console.log(parsedJourneysJson);
         const modifiedJourneys = parsedJourneysJson.map(journey => {
           journey.isSelected = false;
           journey.style = styles.journeyView;
@@ -254,6 +245,8 @@ const TicketsScreen = ({navigation}) => {
   const addJourney = async () => {
     const isValid = validateJourney();
     if (isValid) {
+
+      setAddTicketButtonText('Processing');
       const journeyDetails = `${journeyFrom}${journeyTo}${journeyDay}${journeyTime}`;
       const hash = await sha256(journeyDetails);
       let journey = {
@@ -265,8 +258,6 @@ const TicketsScreen = ({navigation}) => {
         ticket_number: ticketNumber.toUpperCase(),
       };
 
-      setJourneys([...journeys, journey]);
-
       // Clear inputs
       setJourneyFrom('');
       setJourneyTo('');
@@ -276,28 +267,38 @@ const TicketsScreen = ({navigation}) => {
       setJourneyTime('HH:mm');
       setLoading(false);
 
-      AsyncStorage.setItem('journeys', JSON.stringify([...journeys, journey]));
-
       toggleModalVisibility(false);
 
-      journey = {
-        journey_id: hash,
+      const requestJourney = {
         journey_from: journeyFrom,
         journey_to: journeyTo,
         journey_datetime: `${journeyDay} ${journeyTime}`,
       };
 
-      fetch(
-        `https://esrs-staging.herokuapp.com/api/auth/users/${id}/journeys`,
+      const response = await fetch(
+        `https://esrs.herokuapp.com/api/auth/users/${id}/journeys`,
         {
           method: 'PUT',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(journey),
+          body: JSON.stringify(requestJourney),
         },
       );
+
+      setAddTicketButtonText('Add Journey');
+      if (response.status === 200) {
+        journey.metadata = (await response).json();
+        setJourneys([...journeys, journey]);
+        AsyncStorage.setItem(
+          'journeys',
+          JSON.stringify([...journeys, journey]),
+        );
+      } else {
+        Alert.alert('Add Journey', 'Please input a valid journey');
+      }
+
     }
   };
 
@@ -480,6 +481,7 @@ const TicketsScreen = ({navigation}) => {
                   dateTime: journeys[index].journey_datetime,
                   price: journeys[index].ticket_price,
                   number: journeys[index].ticket_number,
+                  metaDataId: journeys[index].metadata,
                 });
               }
             }}
@@ -545,7 +547,7 @@ const TicketsScreen = ({navigation}) => {
         loadNum={loadProgress}
         onLoad={num => setLoading(num)}
         onLoadNum={num => setLoadProgress(num)}
-        positiveButtonName="Add Journey"
+        positiveButtonName={addTicketButtonText}
       />
     </View>
   );
