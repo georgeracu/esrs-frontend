@@ -27,7 +27,7 @@ const TicketDashboard = ({route, navigation}) => {
     dateTime,
     price,
     number,
-    metaData,
+    metaDataId,
   } = route.params;
 
   const [journeyFrom, setJourneyFrom] = useState(from);
@@ -153,9 +153,7 @@ const TicketDashboard = ({route, navigation}) => {
       };
 
       fetch(
-        `https://esrs.herokuapp.com/api/auth/users/${user_id}/journeys/${
-          metaData.journey_id
-        }`,
+        `https://esrs.herokuapp.com/api/auth/users/${user_id}/journeys/${metaDataId}`,
         {
           method: 'PUT',
           headers: {

@@ -481,7 +481,7 @@ const TicketsScreen = ({navigation}) => {
                   dateTime: journeys[index].journey_datetime,
                   price: journeys[index].ticket_price,
                   number: journeys[index].ticket_number,
-                  metaData: journeys[index].metadata,
+                  metaDataId: journeys[index].metadata,
                 });
               }
             }}
