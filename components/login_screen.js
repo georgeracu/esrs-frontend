@@ -52,7 +52,7 @@ const LoginScreen = ({navigation}) => {
             await AsyncStorage.setItem('email', email);
             await AsyncStorage.setItem('password', hash);
 
-            const response = await fetch(`https://esrs-staging.herokuapp.com/api/auth/users/${credentials.user.uid}`, {
+            const response = await fetch(`https://esrs.herokuapp.com/api/auth/users/${credentials.user.uid}`, {
                 headers: {
                     method: 'GET',
                     Accept: 'application/json',

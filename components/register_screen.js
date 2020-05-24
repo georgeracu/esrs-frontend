@@ -54,7 +54,7 @@ const RegisterScreen = ({navigation}) => {
 
                 const userCredentials = {'user_id': credentials.user.uid, 'email': email};
 
-                const response = await fetch('https://esrs-staging.herokuapp.com/api/auth/users', {
+                const response = await fetch('https://esrs.herokuapp.com/api/auth/users', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',

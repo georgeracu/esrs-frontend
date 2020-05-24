@@ -19,7 +19,16 @@ import {useFocusEffect} from '@react-navigation/native';
 import AddJourneyModal from './add_journey_modal';
 
 const TicketDashboard = ({route, navigation}) => {
-  const {user_id, id, from, to, dateTime, price, number} = route.params;
+  const {
+    user_id,
+    id,
+    from,
+    to,
+    dateTime,
+    price,
+    number,
+    metaData,
+  } = route.params;
 
   const [journeyFrom, setJourneyFrom] = useState(from);
   const [journeyTo, setJourneyTo] = useState(to);
@@ -144,7 +153,9 @@ const TicketDashboard = ({route, navigation}) => {
       };
 
       fetch(
-        `https://esrs-staging.herokuapp.com/api/auth/users/${user_id}/journeys/${id}`,
+        `https://esrs.herokuapp.com/api/auth/users/${user_id}/journeys/${
+          metaData.journey_id
+        }`,
         {
           method: 'PUT',
           headers: {
