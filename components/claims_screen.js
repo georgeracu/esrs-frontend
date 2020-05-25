@@ -8,7 +8,7 @@ const ClaimsScreen = ({route, navigation}) => {
   let serviceUri = '';
   switch (service) {
     case 'Southern Rail':
-      serviceUri = 'https://delayrepay.southernrailway.com/customer-details';
+      serviceUri = 'https://delayrepay.southernrailway.com';
       break;
     case 'Great Western Rail':
       serviceUri = 'https://delayrepay.gwr.com/make-claim';
